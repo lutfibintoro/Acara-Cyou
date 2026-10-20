@@ -1,2 +1,32 @@
-# mysql
-# backend
+services:
+  backend:
+    build:
+      context: ./WebServer
+      dockerfile: Dockerfile
+    networks:
+      - acaracyou_net
+    environment:
+      ASPNETCORE_HTTP_PORTS: 8081
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__MariadbConnection: Server=mariadb;Port=3306;Database=AcaraCyouDb;Uid=root;Pwd=admin;AllowUserVariables=True;
+    depends_on:
+      mariadb:
+        condition: service_started
+    ports:
+      - "8081:8081"
+
+  mariadb:
+    image: mariadb:latest
+    environment:
+      MARIADB_ROOT_PASSWORD: admin
+    networks:
+      - acaracyou_net
+    volumes:
+      - acaracyou_mariadb_volume:/var/lib/mysql
+
+volumes:
+  acaracyou_mariadb_volume:
+  
+networks:
+  acaracyou_net:
+    driver: bridge
