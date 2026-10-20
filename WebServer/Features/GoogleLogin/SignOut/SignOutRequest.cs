@@ -5,7 +5,7 @@ namespace WebServer.Features.GoogleLogin.SignOut
     public record SignOutRequest
     (
         [property: FromBody]
-        Body? Body
+        Body Body
     );
 
     public record Body

@@ -17,7 +17,6 @@ namespace WebServer.Features.GoogleLogin.SignOut
             {
                 RuleFor(request => request.Body!.RefreshToken)
                     .NotNull()
-                    .NotEmpty()
                     .Length(Base64Url.EncodeToString(Guid.NewGuid().ToByteArray()).Length);
             });
         }

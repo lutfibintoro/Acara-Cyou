@@ -10,6 +10,7 @@ namespace WebServer.Features.GoogleLogin.SignOut
             Response(StatusCodes.Status302Found);
             Response<Infrastructures.ResponseError.ProblemDetails>(StatusCodes.Status400BadRequest, contentType: "application/problem+json");
             Response<Infrastructures.ResponseError.ProblemDetails>(StatusCodes.Status401Unauthorized, contentType: "application/problem+json");
+            Response<Infrastructures.ResponseError.ProblemDetails>(StatusCodes.Status415UnsupportedMediaType, contentType: "application/problem+json");
             Response<Infrastructures.ResponseError.ProblemDetails>(StatusCodes.Status500InternalServerError, contentType: "application/problem+json");
         }
     }

@@ -25,11 +25,13 @@ namespace WebServer.Features.GoogleLogin.SignOut
         public override void Configure()
         {
             Delete("/api/google-login/sign-out");
+            AllowAnonymous();
+            Description(x => x.Accepts<SignOutRequest>("application/json"));
         }
 
         public override async Task HandleAsync(SignOutRequest req, CancellationToken ct)
         {
-            Result commandResult = await _sender.Send(new SignOutCommand(req.Body!.RefreshToken));
+            Result commandResult = await _sender.Send(new SignOutCommand(req.Body!.RefreshToken), ct);
 
             if (commandResult.IsFailed)
             {
