@@ -22,7 +22,7 @@ namespace WebServer.Features.GoogleLogin.KeyExchange
 
         public override void Configure()
         {
-            Get("/api/google-login/key-exchange");
+            Post("/api/google-login/key-exchange");
             AllowAnonymous();
         }
 
