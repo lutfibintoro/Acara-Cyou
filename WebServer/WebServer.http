@@ -2,5 +2,74 @@
 
 GET {{WebServer_HostAddress}}/weatherforecast/
 Accept: application/json
+###
 
+
+POST https://sandbox.duitku.com/webapi/api/merchant/paymentmethod/getpaymentmethod
+Accept: application/json
+Content-Type: application/json
+{
+  "merchantcode": "DS36644",
+  "amount": 30000,
+  "datetime": "2026-10-16 08:32:21",
+  "signature": "9e95b95afb13a38706a88d28f2c4340140654c8c3dc715cd773d7184f53e3833"
+}
+###
+
+
+POST https://sandbox.duitku.com/webapi/api/merchant/v2/inquiry
+Accept: application/json
+Content-Type: application/json
+{
+   "merchantCode":"DS36644",
+   "paymentAmount":30000,
+   "paymentMethod":"NQ",
+   "merchantOrderId":"abcde12345",
+   "productDetails":"Pembayaran untuk Toko Conto",
+   "additionalParam":"",
+   "merchantUserInfo":"",
+   "customerVaName":"John Doe",
+   "email":"test@test.com",
+   "phoneNumber":"08123456789",
+   "itemDetails":[ 
+      { 
+         "name":"Test Item 1",
+         "price":10000,
+         "quantity":1
+      },
+      { 
+         "name":"Test Item 2",
+         "price":20000,
+         "quantity":3
+      }
+   ],
+   "customerDetail":{ 
+      "firstName":"John",
+      "lastName":"Doe",
+      "email":"test@test.com",
+      "phoneNumber":"08123456789",
+      "billingAddress":{ 
+         "firstName":"John",
+         "lastName":"Doe",
+         "address":"Jl. Kembangan Raya",
+         "city":"Jakarta",
+         "postalCode":"11530",
+         "phone":"08123456789",
+         "countryCode":"ID"
+      },
+      "shippingAddress":{ 
+         "firstName":"John",
+         "lastName":"Doe",
+         "address":"Jl. Kembangan Raya",
+         "city":"Jakarta",
+         "postalCode":"11530",
+         "phone":"08123456789",
+         "countryCode":"ID"
+      }
+   },
+   "callbackUrl":"http:\/\/example.com\/callback",
+   "returnUrl":"http:\/\/example.com\/return",
+   "signature":"b2cb4da6d986a09962821494c9ec50244fbf325fd3427c6ef0145a8fed91e5e1",
+   "expiryPeriod":1440
+}
 ###
