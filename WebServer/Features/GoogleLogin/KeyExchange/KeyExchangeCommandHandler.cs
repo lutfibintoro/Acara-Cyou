@@ -173,6 +173,7 @@ namespace WebServer.Features.GoogleLogin.KeyExchange
 
             return Result.Ok<string>(jwt);
         }
+
         private async Task<Result<string>> GenerateAndSaveRefreshToken(AcaraCyouUser acaraCyouUser)
         {
             string refreshToken = Base64Url.EncodeToString(Guid.NewGuid().ToByteArray());

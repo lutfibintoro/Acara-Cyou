@@ -37,7 +37,7 @@ namespace WebServer.Features.GoogleLogin.Redirect
                 Name: User.Claims.Where(claim => claim.Type == ClaimTypes.Name).First().Value,
                 Email: User.Claims.Where(claim => claim.Type == ClaimTypes.Email).First().Value,
                 LoginProvider: User.Identity?.AuthenticationType ?? "Unknown",
-                ProfileImageUrl: User.FindFirstValue("urn:google:picture") ?? "/"
+                ProfileImageUrl: User.FindFirstValue("urn:google:picture") ?? ""
             );
 
             Result<string> commandResult = await _sender.Send(command, ct);
