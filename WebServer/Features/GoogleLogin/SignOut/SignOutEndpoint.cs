@@ -25,7 +25,6 @@ namespace WebServer.Features.GoogleLogin.SignOut
         public override void Configure()
         {
             Delete("/api/google-login/sign-out");
-            AllowAnonymous();
             Description(x => x.Accepts<SignOutRequest>("application/json"));
         }
 
