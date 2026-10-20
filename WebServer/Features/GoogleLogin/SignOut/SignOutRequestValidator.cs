@@ -10,12 +10,12 @@ namespace WebServer.Features.GoogleLogin.SignOut
         {
             RuleLevelCascadeMode = CascadeMode.Continue;
 
-            RuleFor(request => request.Body)
+            RuleFor(request => request.Query)
                 .NotNull();
 
-            When(request => request.Body is not null, () =>
+            When(request => request.Query is not null, () =>
             {
-                RuleFor(request => request.Body!.RefreshToken)
+                RuleFor(request => request.Query!.RefreshToken)
                     .NotNull()
                     .Length(Base64Url.EncodeToString(Guid.NewGuid().ToByteArray()).Length);
             });

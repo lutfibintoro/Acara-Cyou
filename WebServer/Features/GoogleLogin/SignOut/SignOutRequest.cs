@@ -4,11 +4,11 @@ namespace WebServer.Features.GoogleLogin.SignOut
 {
     public record SignOutRequest
     (
-        [property: FromBody]
-        Body Body
+        [property: FromQuery]
+        Query? Query
     );
 
-    public record Body
+    public record Query
     (
         string RefreshToken
     );
