@@ -1,9 +1,11 @@
 @page "/not-found"
 @layout MainLayout
 
-<PageTitle>Not Found</PageTitle>
-
-<MudText Typo="Typo.h3" GutterBottom="true">404 - Page Not Found</MudText>
-<MudText Class="mb-8">Sorry, the content you are looking for does not exist.</MudText>
-
-<MudButton Variant="Variant.Filled" Color="Color.Primary" Href="/">Go to Home</MudButton>
+<MudPaper Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent py-15">
+	<MudContainer MaxWidth="MaxWidth.Small">
+		<MudStack Row="false" AlignItems="AlignItems.Center" Justify="Justify.Center">
+			<MudText Typo="Typo.h3" Align="Align.Center">Acara Tidak Ketemu</MudText>
+			<MudButton Variant="Variant.Filled" Color="Color.Secondary" Href="/">Kembali</MudButton>
+		</MudStack>
+	</MudContainer>
+</MudPaper>

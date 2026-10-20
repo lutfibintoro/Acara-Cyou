@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
@@ -13,8 +14,16 @@ namespace Web
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
+            builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddMudServices();
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
+            // backend
+            builder.Services.AddHttpClient("backend", client =>
+            {
+                client.BaseAddress = new Uri("https://acara.cyou.somee.com");
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
 
             await builder.Build().RunAsync();
         }

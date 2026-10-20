@@ -8,31 +8,11 @@
 
 <MudLayout>
 	<MudAppBar Fixed="false" Elevation="0">
-		<MudText Color="Color.Primary" Typo="Typo.h4" HtmlTag="h1" Class="cursor-pointer">
+		<MudText Color="Color.Primary" Typo="Typo.h4" HtmlTag="h1" Class="cursor-pointer" @onclick="NavigateToPage">
 			<b>Acara</b><MudText Color="Color.Secondary" Inline="true" Typo="Typo.caption">.<b>Cyou</b></MudText>
 		</MudText>
 
 		<MudSpacer />
-
-		<MudHidden Breakpoint="Breakpoint.SmAndDown">
-			<MudFab Color="@Color.Default" Variant="Variant.Text" Label="Mekanisme" />
-			<MudFab Color="@Color.Default" Variant="Variant.Text" Label="Fitur" />
-			<MudFab Color="@Color.Default" Variant="Variant.Text" Label="Tentang" />
-			<MudFab Color="Color.Primary"
-					StartIcon="@Icons.Material.Outlined.Event"
-					Label="Buat Form"
-					Variant="Variant.Filled"
-					Size="Size.Medium"
-					DropShadow="false" />
-		</MudHidden>
-
-		<MudHidden Breakpoint="Breakpoint.MdAndUp">
-			<MudToggleIconButton @bind-Toggled="_drawerOpen"
-								 Icon="@Icons.Material.Outlined.Menu"
-								 Color="@Color.Default"
-								 ToggledIcon="@Icons.Material.Outlined.MenuOpen"
-								 ToggledColor="@Color.Default" />
-		</MudHidden>
 
 		<MudToggleIconButton @bind-Toggled="_isDarkMode"
 							 Icon="@Icons.Material.Outlined.LightMode"
@@ -41,34 +21,21 @@
 							 ToggledColor="@Color.Default" />
 	</MudAppBar>
 
-	<MudDrawer @bind-Open="_drawerOpen" Elevation="2" Variant="DrawerVariant.Temporary">
-		<MudDrawerHeader>
-			<MudText Color="Color.Primary" Typo="Typo.h4" HtmlTag="h1">
-				<b>Acara</b><MudText Color="Color.Secondary" Inline="true" Typo="Typo.caption">.<b>Cyou</b></MudText>
-			</MudText>
-		</MudDrawerHeader>
-		<MudStack Spacing="0" Row="false" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center">
-			<MudFab Color="@Color.Default" Variant="Variant.Text" Label="Mekanisme" />
-			<MudFab Color="@Color.Default" Variant="Variant.Text" Label="Fitur" />
-			<MudFab Color="@Color.Default" Variant="Variant.Text" Label="Tentang" />
-			<MudFab Color="Color.Primary"
-					StartIcon="@Icons.Material.Outlined.Event"
-					Label="Buat Form"
-					Variant="Variant.Filled"
-					Size="Size.Medium"
-					DropShadow="false" />
-		</MudStack>
-	</MudDrawer>
-
 	<MudMainContent Class="pa-0">
 		@Body
 	</MudMainContent>
+
+	<MudAppBar Bottom="true" Elevation="0" Fixed="false" Color="Color.Surface">
+		<MudText Typo="Typo.caption">&copy; 2026 Acara.Cyou (All rights reserved)</MudText>
+		<MudSpacer />
+		<MudText id="kontak" Typo="Typo.caption">whatsapp: +6281216317230</MudText>
+	</MudAppBar>
 </MudLayout>
 
 @code {
-	private bool _drawerOpen = false;
 	private bool _isDarkMode = false;
 	private MudTheme? _theme;
+	[Inject] private NavigationManager _navigation { get; set; } = null!;
 
 	protected override void OnInitialized()
 	{
@@ -121,9 +88,5 @@
 		OverlayLight = "#1e1e2d80",
 	};
 
-	public string DarkLightModeButtonIcon => _isDarkMode switch
-	{
-		true => Icons.Material.Rounded.AutoMode,
-		false => Icons.Material.Outlined.DarkMode,
-	};
+	private void NavigateToPage() => _navigation.NavigateTo("/");
 }

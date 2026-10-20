@@ -1,0 +1,58 @@
+﻿@page "/google-login/callback"
+@layout MainLayout
+@using Blazored.LocalStorage
+@inject NavigationManager NavigationManager
+@inject IHttpClientFactory HttpClientFactory
+@inject ILocalStorageService LocalStorageService
+
+<MudOverlay Visible="true" DarkBackground="true" Absolute="true" ZIndex="5000">
+	<MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+</MudOverlay>
+
+
+@code {
+	[Parameter]
+	[SupplyParameterFromQuery(Name = "key")]
+	public string? Key { get; set; }
+	[Parameter]
+	[SupplyParameterFromQuery(Name = "returnUrl")]
+	public string? ReturnUrl { get; set; }
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (!firstRender)
+			return;
+
+		if (Key is null || ReturnUrl is null)
+		{
+			NavigationManager.NavigateTo("/");
+			return;
+		}
+
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		using (HttpResponseMessage response = await client.GetAsync($"/api/google-login/key-exchange?key={Key}"))
+		{
+			if (response.StatusCode != System.Net.HttpStatusCode.OK)
+			{
+				NavigationManager.NavigateTo(ReturnUrl);
+				return;
+			}
+
+			KeyExchangeResponse? keyExchangeResponse = await response.Content.ReadFromJsonAsync<KeyExchangeResponse>();
+			await LocalStorageService.SetItemAsStringAsync("jwt", keyExchangeResponse!.JsonWebToken);
+			await LocalStorageService.SetItemAsStringAsync("refreshToken", keyExchangeResponse!.RefreshToken);
+			await LocalStorageService.SetItemAsStringAsync("profileImageUrl", keyExchangeResponse!.ProfileImageUrl);
+
+			NavigationManager.NavigateTo(ReturnUrl);
+		}
+	}
+
+
+
+	public record KeyExchangeResponse
+	(
+		string JsonWebToken,
+		string RefreshToken,
+		string ProfileImageUrl
+	);
+}
