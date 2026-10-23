@@ -1,5 +1,5 @@
 ﻿@page "/google-login/callback"
-@layout MainLayout
+@layout DashboardLayout
 @using Blazored.LocalStorage
 @inject NavigationManager NavigationManager
 @inject IHttpClientFactory HttpClientFactory
@@ -28,9 +28,10 @@
 			NavigationManager.NavigateTo("/");
 			return;
 		}
+		await Task.Delay(1000);
 
 		HttpClient client = HttpClientFactory.CreateClient("backend");
-		using (HttpResponseMessage response = await client.GetAsync($"/api/google-login/key-exchange?key={Key}"))
+		using (HttpResponseMessage response = await client.PostAsync($"/api/google-login/key-exchange?key={Key}", null))
 		{
 			if (response.StatusCode != System.Net.HttpStatusCode.OK)
 			{
@@ -47,12 +48,7 @@
 		}
 	}
 
-
-
-	public record KeyExchangeResponse
-	(
-		string JsonWebToken,
-		string RefreshToken,
-		string ProfileImageUrl
-	);
+	#region support record or class
+	public record KeyExchangeResponse(string JsonWebToken, string RefreshToken, string ProfileImageUrl);
+	#endregion
 }

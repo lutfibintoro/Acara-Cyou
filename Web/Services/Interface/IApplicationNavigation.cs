@@ -1,0 +1,22 @@
+﻿namespace Web.Services.Interface
+{
+    public interface IApplicationNavigation
+    {
+        public void NavigateToFitur();
+        public void NavigateToKontak();
+        public void NavigateToFaq();
+        public void NavigateToPage();
+        public void NavigateToEvents();
+        public void NavigateToChallenge(string encodeReturnUrl);
+        public void NavigateToDashboard();
+        public void NavigateToParticipants();
+        public void NavigateToParticipantsCheckIn();
+        public void NavigateToFormEdit();
+        public void NavigateToFormPreview();
+        public void NavigateToFormShare();
+        public void NavigateToTicketEdit();
+        public void NavigateToTicketPreview();
+        public void NavigateToTicketPrice();
+        public void NavigateToFunds();
+    }
+}

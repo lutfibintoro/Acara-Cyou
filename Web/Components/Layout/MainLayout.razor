@@ -1,4 +1,6 @@
 @inherits LayoutComponentBase
+@using Services.Interface
+@inject IApplicationNavigation AppNav
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
 <MudPopoverProvider />
@@ -8,23 +10,23 @@
 
 <MudLayout>
 	<MudAppBar Fixed="false" Elevation="0">
-		<MudText Color="Color.Primary" Typo="Typo.h4" HtmlTag="h1" Class="cursor-pointer" @onclick="NavigateToPage">
+		<MudText Color="Color.Primary" Typo="Typo.h4" HtmlTag="h1" Class="cursor-pointer" @onclick="AppNav.NavigateToPage">
 			<b>Acara</b><MudText Color="Color.Secondary" Inline="true" Typo="Typo.caption">.<b>Cyou</b></MudText>
 		</MudText>
 
 		<MudSpacer />
 
 		<MudHidden Breakpoint="Breakpoint.SmAndDown">
-			<MudFab Color="@Color.Default" Variant="Variant.Text" Label="FITUR" OnClick="NavigateToFitur" />
-			<MudFab Color="@Color.Default" Variant="Variant.Text" Label="KONTAK" OnClick="NavigateToKontak" />
-			<MudFab Color="@Color.Default" Variant="Variant.Text" Label="FAQ" OnClick="NavigateToFaq" />
+			<MudFab Color="@Color.Default" Variant="Variant.Text" Label="FITUR" OnClick="AppNav.NavigateToFitur" />
+			<MudFab Color="@Color.Default" Variant="Variant.Text" Label="KONTAK" OnClick="AppNav.NavigateToKontak" />
+			<MudFab Color="@Color.Default" Variant="Variant.Text" Label="FAQ" OnClick="AppNav.NavigateToFaq" />
 			<MudFab Color="Color.Primary"
 					StartIcon="@Icons.Material.Outlined.Event"
 					Label="Buat Form"
 					Variant="Variant.Filled"
 					Size="Size.Medium"
 					DropShadow="false"
-					OnClick="NavigateToEvents" />
+					OnClick="AppNav.NavigateToEvents" />
 		</MudHidden>
 
 		<MudHidden Breakpoint="Breakpoint.MdAndUp">
@@ -44,21 +46,21 @@
 
 	<MudDrawer @bind-Open="_drawerOpen" Elevation="2" Variant="DrawerVariant.Temporary">
 		<MudDrawerHeader>
-			<MudText Color="Color.Primary" Typo="Typo.h4" HtmlTag="h1" Class="cursor-pointer" @onclick="NavigateToPage">
+			<MudText Color="Color.Primary" Typo="Typo.h4" HtmlTag="h1" Class="cursor-pointer" @onclick="AppNav.NavigateToPage">
 				<b>Acara</b><MudText Color="Color.Secondary" Inline="true" Typo="Typo.caption">.<b>Cyou</b></MudText>
 			</MudText>
 		</MudDrawerHeader>
 		<MudStack Spacing="0" Row="false" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center">
-			<MudFab Color="@Color.Default" Variant="Variant.Text" Label="FITUR" OnClick="NavigateToFitur" />
-			<MudFab Color="@Color.Default" Variant="Variant.Text" Label="KONTAK" OnClick="NavigateToKontak" />
-			<MudFab Color="@Color.Default" Variant="Variant.Text" Label="FAQ" OnClick="NavigateToFaq" />
+			<MudFab Color="@Color.Default" Variant="Variant.Text" Label="FITUR" OnClick="AppNav.NavigateToFitur" />
+			<MudFab Color="@Color.Default" Variant="Variant.Text" Label="KONTAK" OnClick="AppNav.NavigateToKontak" />
+			<MudFab Color="@Color.Default" Variant="Variant.Text" Label="FAQ" OnClick="AppNav.NavigateToFaq" />
 			<MudFab Color="Color.Primary"
 					StartIcon="@Icons.Material.Outlined.Event"
 					Label="Buat Form"
 					Variant="Variant.Filled"
 					Size="Size.Medium"
 					DropShadow="false"
-					OnClick="NavigateToEvents" />
+					OnClick="AppNav.NavigateToEvents" />
 		</MudStack>
 	</MudDrawer>
 
@@ -75,9 +77,8 @@
 
 @code {
 	private bool _drawerOpen = false;
-	private bool _isDarkMode = true;
+	private bool _isDarkMode = false;
 	private MudTheme? _theme;
-	[Inject] private NavigationManager _navigation { get; set; } = null!;
 
 	protected override void OnInitialized()
 	{
@@ -93,9 +94,9 @@
 
 	private readonly PaletteLight _lightPalette = new()
 	{
-		Primary = "#f93943",
-		Secondary = "#445e93",
-		Tertiary = "#208b3a",
+		Primary = "#5148E4",
+		Secondary = "#FD3F22",
+		Tertiary = "#16B981",
 		Black = "#110e2d",
 		AppbarText = "#424242",
 		AppbarBackground = "rgba(255,255,255,0.8)",
@@ -106,9 +107,9 @@
 
 	private readonly PaletteDark _darkPalette = new()
 	{
-		Primary = "#f93943",
-		Secondary = "#445e93",
-		Tertiary = "#208b3a",
+		Primary = "#5148E4",
+		Secondary = "#FD3F22",
+		Tertiary = "#16B981",
 		Surface = "#1e1e2d",
 		Background = "#1a1a27",
 		BackgroundGray = "#151521",
@@ -134,11 +135,4 @@
 		Divider = "#292838",
 		OverlayLight = "#1e1e2d80",
 	};
-
-
-	private void NavigateToFitur() => _navigation.NavigateTo("/#fitur");
-	private void NavigateToKontak() => _navigation.NavigateTo("/#kontak");
-	private void NavigateToFaq() => _navigation.NavigateTo("/#faq");
-	private void NavigateToPage() => _navigation.NavigateTo("/");
-	private void NavigateToEvents() => _navigation.NavigateTo("/events");
 }

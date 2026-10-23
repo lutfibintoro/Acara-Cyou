@@ -1,5 +1,192 @@
-﻿<h3>EventList</h3>
+﻿@page "/events"
+@layout DashboardLayout
+@using System.Net.Http.Headers
+@using Blazored.LocalStorage
+@using Services.Interface
+@using System.IdentityModel.Tokens.Jwt
+@using System.Linq
+@inject IApplicationNavigation AppNav
+@inject IHttpClientFactory HttpClientFactory
+@inject ILocalStorageService LocalStorageService
+@inject NavigationManager Navigation
+
+<PageTitle>Event - List</PageTitle>
+
+<MudPaper Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent py-15">
+	<MudContainer MaxWidth="MaxWidth.Large">
+		<MudStack Row="false" AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="4">
+			<MudGrid Justify="Justify.FlexStart" Spacing="5">
+				<MudItem xs="12" sm="6" md="4" lg="3">
+					<MudPaper Elevation="0" Outlined="false" Class="mud-secondary" Width="100%" Height="385px">
+						<MudCard Elevation="0" Outlined="true" Style="height: 380px">
+							<MudCarousel Class="mud-width-full" Style="height:200px;" ShowArrows="false" ShowBullets="false" EnableSwipeGesture="true" AutoCycle="true" TData="object">
+								<MudCarouselItem Transition="Transition.Slide">
+									<MudStack Row="false" Reverse="false" Spacing="0" Justify="Justify.Center" AlignItems="AlignItems.Center" Style="height: 100%">
+										<MudImage Elevation="0" ObjectFit="ObjectFit.ScaleDown" ObjectPosition="ObjectPosition.Center" Src="./assets/plus-icon.png"></MudImage>
+									</MudStack>
+								</MudCarouselItem>
+							</MudCarousel>
+							<MudCardContent>
+								<MudText Typo="Typo.h5">Tambah Event Baru</MudText>
+							</MudCardContent>
+							<MudCardActions>
+								<MudButton StartIcon="@Icons.Material.Filled.LibraryAdd" Variant="Variant.Text" Color="Color.Primary">Tambah</MudButton>
+							</MudCardActions>
+						</MudCard>
+					</MudPaper>
+				</MudItem>
+				@foreach (CardEvent cardEvent in _cardEvents)
+				{
+					<MudItem xs="12" sm="6" md="4" lg="3">
+						<MudPaper Elevation="0" Outlined="false" Class="mud-secondary" Width="100%" Height="385px">
+							<MudCard Elevation="0" Outlined="true" Style="height: 380px">
+								<MudCarousel Class="mud-width-full" Style="height:200px;" ShowArrows="true" ShowBullets="false" EnableSwipeGesture="true" AutoCycle="true" TData="object">
+									@foreach (string posterPath in cardEvent.PosterPaths)
+									{
+										<MudCarouselItem Transition="Transition.Slide">
+											<MudImage Elevation="0" ObjectFit="ObjectFit.Cover" ObjectPosition="ObjectPosition.Center" Src="@posterPath"></MudImage>
+										</MudCarouselItem>
+									}
+								</MudCarousel>
+								<MudCardContent>
+									<MudText Typo="Typo.h5">@cardEvent.Title</MudText>
+									<MudText Typo="Typo.body2" Style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+										@cardEvent.Description
+									</MudText>
+								</MudCardContent>
+								<MudCardActions>
+									<MudButton Variant="Variant.Text" Color="Color.Primary">Edit</MudButton>
+									<MudSpacer />
+									<MudButton Variant="Variant.Text" Color="Color.Error">Delete</MudButton>
+								</MudCardActions>
+							</MudCard>
+						</MudPaper>
+					</MudItem>
+				}
+			</MudGrid>
+		</MudStack>
+	</MudContainer>
+</MudPaper>
 
 @code {
+	private DateTime _jwtExpiredTime;
+	private List<CardEvent> _cardEvents = [];
 
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		_cardEvents = await LoadCardEventListAsync();
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			if (!await IsUserAuthenticated())
+			{
+				await ChallengeUnAuthenticatedAsync();
+				return;
+			}
+		}
+
+		if (_jwtExpiredTime < DateTime.UtcNow)
+		{
+			if (!await IsUserAuthenticated())
+			{
+				await ChallengeUnAuthenticatedAsync();
+				return;
+			}
+		}
+	}
+
+	#region load class list
+	private async Task<List<CardEvent>> LoadCardEventListAsync()
+	{
+		return [];
+	}
+
+	#region support class or record
+	public record CardEvent
+	(
+		string EventId,
+		string Title,
+		string Description,
+		List<string> PosterPaths
+	);
+	#endregion
+	#endregion
+
+	#region Authenticated User
+	private async Task<bool> IsUserAuthenticated()
+	{
+		string? refreshToken = await LocalStorageService.GetItemAsync<string>("refreshToken");
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+
+		if (string.IsNullOrEmpty(jwt) || string.IsNullOrEmpty(refreshToken))
+		{
+			return false;
+		}
+
+		if (await IsGetAuthenticateNoContentSuccessAsync(jwt))
+		{
+			SetJwtExpired(jwt);
+			return true;
+		}
+
+		string? newJwt = await PostRefreshTokenAsync(refreshToken);
+		if (newJwt is null)
+		{
+			return false;
+		}
+
+		await LocalStorageService.SetItemAsStringAsync("jwt", newJwt);
+		SetJwtExpired(newJwt);
+		return true;
+	}
+
+	private async Task ChallengeUnAuthenticatedAsync()
+	{
+		string returnUrl = Uri.EscapeDataString(Navigation.Uri);
+		AppNav.NavigateToChallenge(returnUrl);
+	}
+
+	private async Task<string?> PostRefreshTokenAsync(string refreshToken)
+	{
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		using (HttpResponseMessage response = await client.PostAsJsonAsync<RefreshTokenRequestDto>($"/api/google-login/refresh-token", new RefreshTokenRequestDto(refreshToken)))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.OK)
+				return (await response.Content.ReadFromJsonAsync<RefreshTokenResponseDto>())!.JsonWebToken;
+			else
+				return null;
+		}
+	}
+
+	private async Task<bool> IsGetAuthenticateNoContentSuccessAsync(string jwt)
+	{
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+		using (HttpResponseMessage response = await client.GetAsync($"/api/no-content/authenticated"))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+				return true;
+			else
+				return false;
+		}
+	}
+
+	public record RefreshTokenRequestDto(string RefreshToken);
+	public record RefreshTokenResponseDto(string JsonWebToken);
+	#endregion
+
+	#region Sets jwt expiration
+	private void SetJwtExpired(string jwt)
+	{
+		JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+		JwtSecurityToken jwtToken = handler.ReadJwtToken(jwt);
+		string expClaim = jwtToken.Claims.FirstOrDefault(cclaim => cclaim.Type == JwtRegisteredClaimNames.Exp)?.Value!;
+		long expSecond = long.Parse(expClaim);
+		_jwtExpiredTime = DateTimeOffset.FromUnixTimeSeconds(expSecond).UtcDateTime;
+	}
+	#endregion
 }

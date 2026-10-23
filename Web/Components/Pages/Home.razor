@@ -1,7 +1,9 @@
 @page "/"
 @layout MainLayout
+@using Services.Interface
+@inject IApplicationNavigation AppNav
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Acara Cyou - Pendaftaran Acara, Pembayaran & Tiket Otomatis</PageTitle>
 
 <MudPaper Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent py-15">
 	<MudContainer MaxWidth="MaxWidth.Small">
@@ -15,7 +17,7 @@
 					Variant="Variant.Filled"
 					Size="Size.Large"
 					DropShadow="false"
-					OnClick="NavigateToEvents" />
+					OnClick="AppNav.NavigateToEvents" />
 		</MudStack>
 	</MudContainer>
 </MudPaper>
@@ -60,8 +62,51 @@
 
 <MudPaper Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent py-15">
 	<MudContainer MaxWidth="MaxWidth.Large">
+		<MudGrid Justify="Justify.Center" Spacing="0">
+			<MudItem xs="12" sm="6" Class="d-flex align-center">
+				<MudPaper Elevation="0" Outlined="false" Class="shades transparent px-6">
+					<MudText Color="Color.Primary" Typo="Typo.overline" Align="Align.Start">TANPA ANTRE PANJANG</MudText>
+					<MudText Typo="Typo.h4" Align="Align.Start"><b>Check-in cepat</b></MudText>
+					<MudText Typo="Typo.body2" Align="Align.Start" Class="py-4">Lupakan daftar hadir manual. Pindai QR pada e-tiket untuk check-in instan, dan pantau jumlah kehadiran secara real-time.</MudText>
+					<MudStack Row="false" Justify="Justify.Center" AlignItems="AlignItems.Start" Spacing="2">
+						<MudStack Row="true" Spacing="2">
+							<MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Primary" Size="Size.Small" />
+							<MudText Typo="Typo.body2" Align="Align.Start">E-tiket dengan QR code</MudText>
+						</MudStack>
+						<MudStack Row="true" Spacing="2">
+							<MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Primary" Size="Size.Small" />
+							<MudText Typo="Typo.body2" Align="Align.Start">Check-in cepat</MudText>
+						</MudStack>
+						<MudStack Row="true" Spacing="2">
+							<MudHidden Breakpoint="Breakpoint.Xs">
+								<MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Primary" Size="Size.Small" />
+								<MudText Typo="Typo.body2" Align="Align.Start">Pantau kehadiran</MudText>
+							</MudHidden>
+							<MudHidden Breakpoint="Breakpoint.SmAndUp">
+								<MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Primary" Size="Size.Small" />
+								<MudText Typo="Typo.body2" Align="Align.Start" Class="pb-4">Pantau kehadiran</MudText>
+							</MudHidden>
+						</MudStack>
+					</MudStack>
+				</MudPaper>
+			</MudItem>
+			<MudItem xs="12" sm="6" Class="d-flex align-center">
+				<MudPaper Elevation="0" Outlined="true" Width="100%" Class="rounded-lg pa-4" Style="background-color: rgba(var(--mud-palette-secondary-rgb), 0.1)">
+					<MudStack Row="false" Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="0">
+						<MudPaper Elevation="0" Outlined="false" Class="shades transparent" MaxWidth="250px">
+							<MudImage ObjectFit="ObjectFit.Fill" Src="./assets/scanQR-animation.webp" Elevation="0" Class="rounded-lg" Fluid="true" />
+						</MudPaper>
+					</MudStack>
+				</MudPaper>
+			</MudItem>
+		</MudGrid>
+	</MudContainer>
+</MudPaper>
+
+<MudPaper Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent py-15">
+	<MudContainer MaxWidth="MaxWidth.Large">
 		<MudStack Row="false" AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="0">
-			<MudText id="fitur" Color="Color.Primary" Typo="Typo.overline" Align="Align.Center">FITUR UTAMA</MudText>
+			<MudText id="fitur" Color="Color.Secondary" Typo="Typo.overline" Align="Align.Center">FITUR UTAMA</MudText>
 			<MudText Typo="Typo.h4" Align="Align.Center"><b>Kelola acara dari penjualan sampai pintu masuk</b></MudText>
 			<MudText Typo="Typo.body2" Align="Align.Center" Class="pb-8">Semua kebutuhan ticketing dalam satu platform.</MudText>
 			<MudGrid Justify="Justify.Center" Spacing="5">
@@ -133,49 +178,6 @@
 				</MudItem>
 			</MudGrid>
 		</MudStack>
-	</MudContainer>
-</MudPaper>
-
-<MudPaper Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent py-15">
-	<MudContainer MaxWidth="MaxWidth.Large">
-		<MudGrid Justify="Justify.Center" Spacing="0">
-			<MudItem xs="12" sm="6" Class="d-flex align-center">
-				<MudPaper Elevation="0" Outlined="false" Class="shades transparent px-6">
-					<MudText Color="Color.Secondary" Typo="Typo.overline" Align="Align.Start">TANPA ANTRE PANJANG</MudText>
-					<MudText Typo="Typo.h4" Align="Align.Start"><b>Check-in cepat</b></MudText>
-					<MudText Typo="Typo.body2" Align="Align.Start" Class="py-4">Lupakan daftar hadir manual. Pindai QR pada e-tiket untuk check-in instan, dan pantau jumlah kehadiran secara real-time.</MudText>
-					<MudStack Row="false" Justify="Justify.Center" AlignItems="AlignItems.Start" Spacing="2">
-						<MudStack Row="true" Spacing="2">
-							<MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Secondary" Size="Size.Small" />
-							<MudText Typo="Typo.body2" Align="Align.Start">E-tiket dengan QR code</MudText>
-						</MudStack>
-						<MudStack Row="true" Spacing="2">
-							<MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Secondary" Size="Size.Small" />
-							<MudText Typo="Typo.body2" Align="Align.Start">Check-in cepat</MudText>
-						</MudStack>
-						<MudStack Row="true" Spacing="2">
-							<MudHidden Breakpoint="Breakpoint.Xs">
-								<MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Secondary" Size="Size.Small" />
-								<MudText Typo="Typo.body2" Align="Align.Start">Pantau kehadiran</MudText>
-							</MudHidden>
-							<MudHidden Breakpoint="Breakpoint.SmAndUp">
-								<MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Secondary" Size="Size.Small" />
-								<MudText Typo="Typo.body2" Align="Align.Start" Class="pb-4">Pantau kehadiran</MudText>
-							</MudHidden>
-						</MudStack>
-					</MudStack>
-				</MudPaper>
-			</MudItem>
-			<MudItem xs="12" sm="6" Class="d-flex align-center">
-				<MudPaper Elevation="0" Outlined="true" Width="100%" Class="rounded-lg pa-4" Style="background-color: rgba(var(--mud-palette-secondary-rgb), 0.1)">
-					<MudStack Row="false" Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="0">
-						<MudPaper Elevation="0" Outlined="false" Class="shades transparent" MaxWidth="250px">
-							<MudImage ObjectFit="ObjectFit.Fill" Src="scanQR-animation.webp" Elevation="0" Class="rounded-lg" Fluid="true" />
-						</MudPaper>
-					</MudStack>
-				</MudPaper>
-			</MudItem>
-		</MudGrid>
 	</MudContainer>
 </MudPaper>
 
@@ -280,10 +282,3 @@
 <MudScrollToTop>
 	<MudFab Size="Size.Small" IconSize="Size.Large" Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.KeyboardArrowUp" />
 </MudScrollToTop>
-
-
-@code {
-	[Inject] private NavigationManager _navigation { get; set; } = null!;
-
-	private void NavigateToEvents() => _navigation.NavigateTo("/events");
-}

@@ -1,18 +1,34 @@
 ﻿@inherits LayoutComponentBase
+@using System.Net.Http.Headers
+@using Blazored.LocalStorage
+@using Services.Interface
+@inject IApplicationNavigation AppNav
+@inject IHttpClientFactory HttpClientFactory
+@inject ILocalStorageService LocalStorageService
+@inject NavigationManager Navigation
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
 <MudPopoverProvider />
-<MudDialogProvider />
+<MudDialogProvider FullWidth="true"
+				   MaxWidth="MaxWidth.Medium"
+				   BackdropClick="false"
+				   Position="DialogPosition.Center" />
 <MudSnackbarProvider />
 
 
 <MudLayout>
 	<MudAppBar Fixed="false" Elevation="0">
-		<MudText Color="Color.Primary" Typo="Typo.h4" HtmlTag="h1" Class="cursor-pointer" @onclick="NavigateToPage">
+		<MudText Color="Color.Primary" Typo="Typo.h4" HtmlTag="h1" Class="cursor-pointer" @onclick="AppNav.NavigateToPage">
 			<b>Acara</b><MudText Color="Color.Secondary" Inline="true" Typo="Typo.caption">.<b>Cyou</b></MudText>
 		</MudText>
 
 		<MudSpacer />
+
+		<MudToggleIconButton @bind-Toggled="_drawerOpen"
+							 Icon="@Icons.Material.Outlined.Menu"
+							 Color="@Color.Default"
+							 ToggledIcon="@Icons.Material.Outlined.MenuOpen"
+							 ToggledColor="@Color.Default" />
 
 		<MudToggleIconButton @bind-Toggled="_isDarkMode"
 							 Icon="@Icons.Material.Outlined.LightMode"
@@ -20,6 +36,55 @@
 							 ToggledIcon="@Icons.Material.Outlined.DarkMode"
 							 ToggledColor="@Color.Default" />
 	</MudAppBar>
+
+	<MudDrawer @bind-Open="_drawerOpen" Elevation="2" Variant="DrawerVariant.Temporary">
+		<MudDrawerHeader>
+			<MudText Color="Color.Primary" Typo="Typo.h4" HtmlTag="h1" Class="cursor-pointer" @onclick="AppNav.NavigateToPage">
+				<b>Acara</b><MudText Color="Color.Secondary" Inline="true" Typo="Typo.caption">.<b>Cyou</b></MudText>
+			</MudText>
+			<MudSpacer />
+			<MudMenu Dense="true" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+				<ActivatorContent>
+					<MudAvatar Class="cursor-pointer" Size="Size.Medium">
+						<MudImage Src=@_profilePictureUrl @onclick="@context.ToggleAsync" />
+					</MudAvatar>
+				</ActivatorContent>
+				<ChildContent>
+					<MudMenuItem Icon="@Icons.Material.Filled.Logout" Label="Sign Out" OnClick="SignOutAsync" />
+				</ChildContent>
+			</MudMenu>
+		</MudDrawerHeader>
+
+		<MudDivider />
+
+		<MudPaper Width="100%" Height="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent">
+			<MudNavMenu MultiExpansion="false" Bordered="true">
+				@if (IsDashboardEventPage())
+				{
+					<MudNavLink Match="NavLinkMatch.All" Href="/events">List Event</MudNavLink>
+				}
+				@if (IsDashboardManagerEventPage())
+				{
+					<MudNavLink Match="NavLinkMatch.All" Href="/dashboard">Dashboard</MudNavLink>
+					<MudNavGroup Expanded="@(_navGroupExpanded == "peserta" ? true : false)" Title="Peserta">
+						<MudNavLink Match="NavLinkMatch.All" Href="/participants">List Peserta</MudNavLink>
+						<MudNavLink Match="NavLinkMatch.All" Href="/participant/check-in">Check-In Peserta</MudNavLink>
+					</MudNavGroup>
+					<MudNavGroup Expanded="@(_navGroupExpanded == "form" ? true : false)" Title="Form">
+						<MudNavLink Match="NavLinkMatch.All" Href="/form/edit">Edit Form</MudNavLink>
+						<MudNavLink Match="NavLinkMatch.All" Href="/form/preview">Preview Form</MudNavLink>
+						<MudNavLink Match="NavLinkMatch.All" Href="/form/share">Share Form</MudNavLink>
+					</MudNavGroup>
+					<MudNavGroup Expanded="@(_navGroupExpanded == "tiket" ? true : false)" Title="Tiket">
+						<MudNavLink Match="NavLinkMatch.All" Href="/ticket/edit">Edit Tiket</MudNavLink>
+						<MudNavLink Match="NavLinkMatch.All" Href="/ticket/preview">Preview Tiket</MudNavLink>
+						<MudNavLink Match="NavLinkMatch.All" Href="/ticket/price">Harga Tiket</MudNavLink>
+					</MudNavGroup>
+					<MudNavLink Match="NavLinkMatch.All" Href="/funds">Funds</MudNavLink>
+				}
+			</MudNavMenu>
+		</MudPaper>
+	</MudDrawer>
 
 	<MudMainContent Class="pa-0">
 		@Body
@@ -33,13 +98,26 @@
 </MudLayout>
 
 @code {
+	private bool _drawerOpen = false;
 	private bool _isDarkMode = false;
 	private MudTheme? _theme;
-	[Inject] private NavigationManager _navigation { get; set; } = null!;
 
-	protected override void OnInitialized()
+	private string _profilePictureUrl = string.Empty;
+	private string? _refreshToken;
+	private string? _jwt;
+
+	private string _navGroupExpanded = string.Empty;
+
+	protected override async Task OnInitializedAsync()
 	{
-		base.OnInitialized();
+		await base.OnInitializedAsync();
+
+		_navGroupExpanded = ExpandedGroup();
+		StateHasChanged();
+
+		_profilePictureUrl = await LocalStorageService.GetItemAsync<string>("profileImageUrl") ?? "/icon-192.png";
+		_refreshToken = await LocalStorageService.GetItemAsync<string>("refreshToken");
+		_jwt = await LocalStorageService.GetItemAsync<string>("jwt");
 
 		_theme = new()
 		{
@@ -51,17 +129,22 @@
 
 	private readonly PaletteLight _lightPalette = new()
 	{
+		Primary = "#5148E4",
+		Secondary = "#FD3F22",
+		Tertiary = "#16B981",
 		Black = "#110e2d",
 		AppbarText = "#424242",
 		AppbarBackground = "rgba(255,255,255,0.8)",
 		DrawerBackground = "#ffffff",
 		GrayLight = "#e8e8e8",
-		GrayLighter = "#f9f9f9",
+		GrayLighter = "#f9f9f9"
 	};
 
 	private readonly PaletteDark _darkPalette = new()
 	{
-		Primary = "#7e6fff",
+		Primary = "#5148E4",
+		Secondary = "#FD3F22",
+		Tertiary = "#16B981",
 		Surface = "#1e1e2d",
 		Background = "#1a1a27",
 		BackgroundGray = "#151521",
@@ -88,5 +171,146 @@
 		OverlayLight = "#1e1e2d80",
 	};
 
-	private void NavigateToPage() => _navigation.NavigateTo("/");
+	#region match drawer nav link
+	private bool IsDashboardManagerEventPage()
+	{
+		string path = $"/{Navigation.ToBaseRelativePath(Navigation.Uri)}";
+		switch (path)
+		{
+			case "/dashboard":
+			case "/participants":
+			case "/participant/check-in":
+			case "/form/edit":
+			case "/form/preview":
+			case "/form/share":
+			case "/ticket/edit":
+			case "/ticket/preview":
+			case "/ticket/price":
+			case "/funds":
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	private bool IsDashboardEventPage()
+	{
+		string path = $"/{Navigation.ToBaseRelativePath(Navigation.Uri)}";
+		switch (path)
+		{
+			case "/events":
+			case "/dashboard":
+			case "/participants":
+			case "/participant/check-in":
+			case "/form/edit":
+			case "/form/preview":
+			case "/form/share":
+			case "/ticket/edit":
+			case "/ticket/preview":
+			case "/ticket/price":
+			case "/funds":
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	private string ExpandedGroup()
+	{
+		string path = $"/{Navigation.ToBaseRelativePath(Navigation.Uri)}";
+		switch (path)
+		{
+			case "/participants":
+			case "/participant/check-in":
+				return "peserta";
+
+			case "/form/edit":
+			case "/form/preview":
+			case "/form/share":
+				return "form";
+
+			case "/ticket/edit":
+			case "/ticket/preview":
+			case "/ticket/price":
+				return "tiket";
+
+			default:
+				return "";
+		}
+	}
+	#endregion
+
+	#region sign out
+	private async Task SignOutAsync()
+	{
+		if (await UserIsNotAuthenticateAsync())
+		{
+			AppNav.NavigateToPage();
+			return;
+		}
+
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _jwt);
+		using (HttpResponseMessage response = await client.DeleteAsync($"/api/google-login/sign-out?refreshToken={_refreshToken}"))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+			{
+				await LocalStorageService.RemoveItemsAsync(["jwt", "refreshToken", "profileImageUrl"]);
+				AppNav.NavigateToPage();
+				return;
+			}
+		}
+	}
+
+	private async Task<bool> UserIsNotAuthenticateAsync()
+	{
+		if (string.IsNullOrEmpty(_refreshToken))
+			return true;
+
+		if (string.IsNullOrEmpty(_jwt))
+		{
+			_jwt = await PostRefreshTokenAsync(_refreshToken);
+			if (_jwt is null)
+				return true;
+		}
+
+		if (!await GetAuthenticateNoContentSuccessAsync(_jwt))
+		{
+			_jwt = await PostRefreshTokenAsync(_refreshToken);
+			if (_jwt is null)
+				return true;
+		}
+
+		return false;
+	}
+
+	private async Task<string?> PostRefreshTokenAsync(string refreshToken)
+	{
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		var refreshTokenRequestDto = new RefreshTokenRequestDto(refreshToken);
+		using (HttpResponseMessage response = await client.PostAsJsonAsync<RefreshTokenRequestDto>($"/api/google-login/refresh-token", refreshTokenRequestDto))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.OK)
+				return (await response.Content.ReadFromJsonAsync<RefreshTokenResponseDto>())!.JsonWebToken;
+			else
+				return null;
+		}
+	}
+
+	private async Task<bool> GetAuthenticateNoContentSuccessAsync(string jwt)
+	{
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+		using (HttpResponseMessage response = await client.GetAsync($"/api/no-content/authenticated"))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+				return true;
+			else
+				return false;
+		}
+	}
+
+	public record RefreshTokenRequestDto(string RefreshToken);
+	public record RefreshTokenResponseDto(string JsonWebToken);
+	#endregion
 }
