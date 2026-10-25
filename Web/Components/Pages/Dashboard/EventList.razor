@@ -5,6 +5,7 @@
 @using Services.Interface
 @using System.IdentityModel.Tokens.Jwt
 @using System.Linq
+@using System.Text.Json
 @inject IApplicationNavigation AppNav
 @inject IHttpClientFactory HttpClientFactory
 @inject ILocalStorageService LocalStorageService
@@ -12,9 +13,10 @@
 
 <PageTitle>Event - List</PageTitle>
 
-<MudPaper Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent py-15">
+<MudPaper Height="100%" Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent pb-15 pt-8">
 	<MudContainer MaxWidth="MaxWidth.Large">
 		<MudStack Row="false" AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="4">
+			<MudFab StartIcon="@Icons.Material.Filled.Refresh" DropShadow="false" OnClick="RefreshCardEvent" />
 			<MudGrid Justify="Justify.FlexStart" Spacing="5">
 				<MudItem xs="12" sm="6" md="4" lg="3">
 					<MudPaper Elevation="0" Outlined="false" Class="mud-secondary" Width="100%" Height="385px">
@@ -26,11 +28,11 @@
 									</MudStack>
 								</MudCarouselItem>
 							</MudCarousel>
-							<MudCardContent>
+							<MudCardContent Class="overflow-y-scroll overflow-x-hidden" Style="height: 10px">
 								<MudText Typo="Typo.h5">Tambah Event Baru</MudText>
 							</MudCardContent>
 							<MudCardActions>
-								<MudButton StartIcon="@Icons.Material.Filled.LibraryAdd" Variant="Variant.Text" Color="Color.Primary">Tambah</MudButton>
+								<MudButton StartIcon="@Icons.Material.Filled.LibraryAdd" Variant="Variant.Text" Color="Color.Primary" OnClick="NewEventOpenDialog">Tambah</MudButton>
 							</MudCardActions>
 						</MudCard>
 					</MudPaper>
@@ -41,23 +43,27 @@
 						<MudPaper Elevation="0" Outlined="false" Class="mud-secondary" Width="100%" Height="385px">
 							<MudCard Elevation="0" Outlined="true" Style="height: 380px">
 								<MudCarousel Class="mud-width-full" Style="height:200px;" ShowArrows="true" ShowBullets="false" EnableSwipeGesture="true" AutoCycle="true" TData="object">
-									@foreach (string posterPath in cardEvent.PosterPaths)
+									@foreach (Poster poster in cardEvent.Posters)
 									{
 										<MudCarouselItem Transition="Transition.Slide">
-											<MudImage Elevation="0" ObjectFit="ObjectFit.Cover" ObjectPosition="ObjectPosition.Center" Src="@posterPath"></MudImage>
+											<MudStack Row="false" Reverse="false" Spacing="0" Justify="Justify.Center" AlignItems="AlignItems.Center" Style="height: 100%">
+												<MudImage Elevation="0" ObjectFit="ObjectFit.Contain" ObjectPosition="ObjectPosition.Center" Height="200" Src="@poster.FullPathUrl"></MudImage>
+											</MudStack>
 										</MudCarouselItem>
 									}
 								</MudCarousel>
-								<MudCardContent>
-									<MudText Typo="Typo.h5">@cardEvent.Title</MudText>
-									<MudText Typo="Typo.body2" Style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
-										@cardEvent.Description
+								<MudCardContent Class="overflow-y-scroll overflow-x-hidden" Style="height: 10px">
+									<MudText Typo="Typo.h5" Style="word-break: break-word;">
+										<b>@cardEvent.Title</b>
+									</MudText>
+									<MudText Typo="Typo.body2" Style="word-break: break-word;">
+										@((MarkupString)cardEvent.Description)
 									</MudText>
 								</MudCardContent>
 								<MudCardActions>
-									<MudButton Variant="Variant.Text" Color="Color.Primary">Edit</MudButton>
+									<MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="() => EventEdit(cardEvent.EventId)">Edit</MudButton>
 									<MudSpacer />
-									<MudButton Variant="Variant.Text" Color="Color.Error">Delete</MudButton>
+									<MudButton Variant="Variant.Text" Color="Color.Error" OnClick="() => EventDelete(cardEvent.EventId)">Delete</MudButton>
 								</MudCardActions>
 							</MudCard>
 						</MudPaper>
@@ -68,9 +74,58 @@
 	</MudContainer>
 </MudPaper>
 
+<MudDialog @bind-Visible="_newEventDialogVisible" Options="_newEventDialogOptions">
+	<TitleContent>
+		<MudText Typo="Typo.h6">Tambah Acara</MudText>
+	</TitleContent>
+	<DialogContent>
+		<MudStack Row="false" AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="4">
+			<MudCard Style="width: 100%;">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Nama Acara</MudText>
+					<MudText Typo="Typo.body2">tulis nama acara / event disini</MudText>
+					<MudTextField FullWidth="true" @bind-Value="_newEvent.Title" Label="" Variant="Variant.Text"></MudTextField>
+				</MudCardContent>
+			</MudCard>
+			<MudCard Style="width: 100%">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Deskripsi Acara</MudText>
+					<MudText Typo="Typo.body2">tulis deskripsi acara / event disini</MudText>
+					<MudExRichTextEdit Height="200" Style="width: 100%" @bind-Value="_newEvent.Description" Immediate="true" Placeholder="" />
+				</MudCardContent>
+			</MudCard>
+			<MudCard Style="width: 100%">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Upload Poster</MudText>
+					<MudText Typo="Typo.body2">maksimal 5 gambar dan 5MB per gambar</MudText>
+					<MudFileUpload T="IBrowserFile" FilesChanged="AddPoster" DragAndDrop="true" Accept=".png, .jpg, .webp" MaxFileSize="(1024 * 1024) * 5">
+						<SelectedTemplate>
+						</SelectedTemplate>
+					</MudFileUpload>
+					<MudChipSet Size="Size.Small" T="string" AllClosable="true" OnClose="@((chip) => RemovePoster(chip.Value))">
+						@foreach (var file in _posterFiles)
+						{
+							<MudChip T=string Size="Size.Small" Value="file.Name" />
+						}
+					</MudChipSet>
+				</MudCardContent>
+			</MudCard>
+		</MudStack>
+	</DialogContent>
+	<DialogActions>
+		<MudButton OnClick="NewEventCloseDialog" Class="px-10">Batal</MudButton>
+		<MudButton Color="Color.Primary" OnClick="SubmitNewEventAsync" Class="px-10">Kirim</MudButton>
+	</DialogActions>
+</MudDialog>
+
+<MudOverlay Visible="_overlayVisible" DarkBackground="true" Absolute="true" ZIndex="5000">
+	<MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+</MudOverlay>
+
 @code {
 	private DateTime _jwtExpiredTime;
 	private List<CardEvent> _cardEvents = [];
+	private bool _overlayVisible = false;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -99,21 +154,142 @@
 		}
 	}
 
-	#region load class list
-	private async Task<List<CardEvent>> LoadCardEventListAsync()
+	#region edit or remove delete
+	private void EventDelete(string eventId)
 	{
-		return [];
+		
 	}
 
-	#region support class or record
-	public record CardEvent
-	(
-		string EventId,
-		string Title,
-		string Description,
-		List<string> PosterPaths
-	);
+	private void EventEdit(string eventId)
+	{
+		
+	}
 	#endregion
+
+	#region New Event Dialog
+	private readonly DialogOptions _newEventDialogOptions = new();
+	private bool _newEventDialogVisible = false;
+
+	private CardEvent _newEvent = new();
+	private List<IBrowserFile> _posterFiles = [];
+
+	private void RemovePoster(string? fileName)
+	{
+		IBrowserFile? removeFile = _posterFiles.Find(file => file.Name == fileName);
+		if (removeFile is null)
+			return;
+
+		_posterFiles.Remove(removeFile);
+	}
+
+	private void AddPoster(IBrowserFile? file)
+	{
+		if (file is null)
+			return;
+
+		_posterFiles.Add(file);
+		if (_posterFiles.Count > 5)
+			_posterFiles.RemoveAt(0);
+	}
+
+	private void NewEventOpenDialog() => _newEventDialogVisible = true;
+
+	private void NewEventCloseDialog() => _newEventDialogVisible = false;
+
+	private async Task SubmitNewEventAsync()
+	{
+		_overlayVisible = true;
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+		client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+		foreach (IBrowserFile browserFile in _posterFiles)
+		{
+			using (var multipartFormContent = new MultipartFormDataContent())
+			using (Stream stream = browserFile.OpenReadStream((1024 * 1024) * 5))
+			using (StreamContent streamContent = new StreamContent(stream))
+			{
+				streamContent.Headers.ContentType = new MediaTypeHeaderValue(browserFile.ContentType);
+				multipartFormContent.Add(streamContent, "file", browserFile.Name);
+				using (HttpResponseMessage response = await client.PostAsync("/api/file", multipartFormContent))
+				{
+					if (response.StatusCode == System.Net.HttpStatusCode.Created)
+					{
+						Poster posterResponse = (await response.Content.ReadFromJsonAsync<Poster>())!;
+						_newEvent.Posters.Add(posterResponse);
+					}
+					else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+					{
+						StateHasChanged();
+					}
+				}
+			}
+		}
+
+		string jsonPoster = JsonSerializer.Serialize<List<Poster>>(_newEvent.Posters);
+		using (StringContent stringContent = new StringContent(
+		$$"""
+		{
+		  "title": "{{_newEvent.Title}}",
+		  "description": "{{_newEvent.Description}}",
+		  "posters": {{jsonPoster}}
+		}
+		""", System.Text.Encoding.UTF8, "application/json"))
+		{
+			using (HttpResponseMessage response = await client.PostAsync("/api/event", stringContent))
+			{
+				if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+				{
+					_posterFiles = [];
+					_newEvent = new CardEvent();
+				}
+			}
+		}
+
+		_overlayVisible = false;
+		_newEventDialogVisible = false;
+		await RefreshCardEvent();
+	}
+	#endregion
+
+	#region event list
+	private async Task RefreshCardEvent() => _cardEvents = await LoadCardEventListAsync();
+
+	private async Task<List<CardEvent>> LoadCardEventListAsync()
+	{
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+		client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+		using (HttpResponseMessage response = await client.GetAsync("/api/event"))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.OK)
+			{
+				return await response.Content.ReadFromJsonAsync<List<CardEvent>>() ?? [];
+			}
+		}
+
+		return [];
+	}
+	#endregion
+
+	#region support class or record
+	public class CardEvent
+	{
+		public string EventId { get; set; } = string.Empty;
+		public string Title { get; set; } = string.Empty;
+		public string Description { get; set; } = string.Empty;
+		public List<Poster> Posters { get; set; } = [];
+	}
+
+	public class Poster
+	{
+		public string FullPathUrl { get; set; } = string.Empty;
+		public string MimeType { get; set; } = string.Empty;
+		public ulong ByteLength { get; set; }
+	}
 	#endregion
 
 	#region Authenticated User

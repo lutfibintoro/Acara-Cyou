@@ -40,5 +40,4 @@
 	  <Folder Include="Infrastructures\Data\Migrations\" />
 	  <Folder Include="Infrastructures\PaymentGateway\Duitku\" />
 	</ItemGroup>
-
 </Project>

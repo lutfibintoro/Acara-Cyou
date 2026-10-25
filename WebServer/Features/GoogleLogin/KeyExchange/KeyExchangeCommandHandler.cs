@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using FluentResults;
+using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -97,11 +98,9 @@ namespace WebServer.Features.GoogleLogin.KeyExchange
             };
             await _dbContext.AddAsync(userLogin);
 
-            try
-            {
-                await _dbContext.SaveChangesAsync();
-            }
-            catch (DbUpdateException) { }
+
+            await _dbContext.SaveChangesAsync();
+
         }
 
         private async Task ConfirmUserLoginProviderAsync(UserInformation userInformation)
@@ -129,11 +128,7 @@ namespace WebServer.Features.GoogleLogin.KeyExchange
                 };
                 await _dbContext.AddAsync(userLogin);
 
-                try
-                {
-                    await _dbContext.SaveChangesAsync();
-                }
-                catch (DbUpdateException) { }
+                await _dbContext.SaveChangesAsync();
             }
         }
         #endregion
@@ -224,6 +219,11 @@ namespace WebServer.Features.GoogleLogin.KeyExchange
                 catch (DbUpdateConcurrencyException) { }
 
                 await Task.Delay(TimeSpan.FromSeconds(1));
+                userToken = await _dbContext.AcaraCyouUserToken
+                    .Where(acaraCyouUserToken => acaraCyouUserToken.Name == "refresh-token")
+                    .Where(acaraCyouUserToken => acaraCyouUserToken.LoginProvider == "Application")
+                    .Where(acaraCyouUserToken => acaraCyouUserToken.UserId == acaraCyouUser.Id)
+                    .FirstOrDefaultAsync();
             }
 
             return Result.Ok<string>(userToken!.Value!);

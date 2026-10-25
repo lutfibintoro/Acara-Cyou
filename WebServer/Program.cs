@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using FastEndpoints;
 using FastEndpoints.OpenApi;
+using FluentValidation;
 using Microsoft.AspNetCore.WebUtilities;
 using Scalar.AspNetCore;
 using WebServer.Extensions;
@@ -68,7 +69,7 @@ namespace WebServer
                             {
                                 Name = validationFailure[i].PropertyName,
                                 Reason = validationFailure[i].ErrorMessage,
-                                Code = (string)new Infrastructures.ResultError.ValidationError<string>("", "", null, Infrastructures.ResultError.Severity.Error).Metadata["code"],
+                                Code = (string)new Infrastructures.ResultError.ValidationError<string>("", "", null, Severity.Error).Metadata["code"],
                                 Severity = "Error"
                             };
                         }

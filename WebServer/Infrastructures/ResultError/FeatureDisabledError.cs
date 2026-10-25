@@ -1,4 +1,5 @@
 ﻿using FluentResults;
+using FluentValidation;
 
 namespace WebServer.Infrastructures.ResultError
 {

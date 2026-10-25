@@ -15,8 +15,10 @@ namespace WebServer.Features.GoogleLogin.Redirect
             When(request => request.Query is not null, () =>
             {
                 RuleFor(request => request.Query!.ReturnUrl)
-                    .Must(returnUrl => returnUrl.StartsWith('/'))
-                    .WithMessage("returnUrl must start with slash '/'");
+                    .Cascade(CascadeMode.Stop)
+                    .NotNull()
+                    .Must(returnUrl => returnUrl.StartsWith("https://") || returnUrl.StartsWith("http://"))
+                    .WithMessage("returnUrl must start with 'https://' or 'http://'");
             });
         }
     }

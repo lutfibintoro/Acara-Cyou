@@ -1,6 +1,7 @@
 ﻿using System.Reflection.Emit;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
 using WebServer.Infrastructures.Data.Entities;
 
 namespace WebServer.Infrastructures.Data
@@ -37,7 +38,8 @@ namespace WebServer.Infrastructures.Data
                 buildAction
                     .Property(acaraCyouUser => acaraCyouUser.Id)
                     .IsRequired(true)
-                    .ValueGeneratedOnAdd();
+                    .ValueGeneratedOnAdd()
+                    .HasValueGenerator<SequentialGuidValueGenerator>();
             });
 
             builder.Entity<AcaraCyouRole>(buildAction =>
@@ -47,7 +49,8 @@ namespace WebServer.Infrastructures.Data
                 buildAction
                     .Property(acaraCyouRole => acaraCyouRole.Id)
                     .IsRequired(true)
-                    .ValueGeneratedOnAdd();
+                    .ValueGeneratedOnAdd()
+                    .HasValueGenerator<SequentialGuidValueGenerator>();
             });
 
             builder.Entity<AcaraCyouUserRole>(buildAction =>
@@ -55,7 +58,8 @@ namespace WebServer.Infrastructures.Data
                 buildAction
                     .Property(acaraCyouUserRole => acaraCyouUserRole.Id)
                     .IsRequired(true)
-                    .ValueGeneratedOnAdd();
+                    .ValueGeneratedOnAdd()
+                    .HasValueGenerator<SequentialGuidValueGenerator>();
 
                 buildAction.HasIndex(ur => ur.Id)
                       .IsUnique();
@@ -68,7 +72,8 @@ namespace WebServer.Infrastructures.Data
                 buildAction
                     .Property(acaraCyouRoleClaim => acaraCyouRoleClaim.Id)
                     .IsRequired(true)
-                    .ValueGeneratedOnAdd();
+                    .ValueGeneratedOnAdd()
+                    .HasValueGenerator<SequentialGuidValueGenerator>();
             });
 
             builder.Entity<AcaraCyouUserClaim>(buildAction =>
@@ -78,7 +83,8 @@ namespace WebServer.Infrastructures.Data
                 buildAction
                     .Property(acaraCyouUserClaim => acaraCyouUserClaim.Id)
                     .IsRequired(true)
-                    .ValueGeneratedOnAdd();
+                    .ValueGeneratedOnAdd()
+                    .HasValueGenerator<SequentialGuidValueGenerator>();
             });
 
             builder.Entity<AcaraCyouUserLogin>(buildAction =>
@@ -86,7 +92,8 @@ namespace WebServer.Infrastructures.Data
                 buildAction
                     .Property(acaraCyouUserLogin => acaraCyouUserLogin.Id)
                     .IsRequired(true)
-                    .ValueGeneratedOnAdd();
+                    .ValueGeneratedOnAdd()
+                    .HasValueGenerator<SequentialGuidValueGenerator>();
 
                 buildAction.HasIndex(ur => ur.Id)
                       .IsUnique();
@@ -97,7 +104,8 @@ namespace WebServer.Infrastructures.Data
                 buildAction
                     .Property(acaraCyouUserToken => acaraCyouUserToken.Id)
                     .IsRequired(true)
-                    .ValueGeneratedOnAdd();
+                    .ValueGeneratedOnAdd()
+                    .HasValueGenerator<SequentialGuidValueGenerator>();
 
                 buildAction.HasIndex(ur => ur.Id)
                       .IsUnique();
@@ -110,7 +118,8 @@ namespace WebServer.Infrastructures.Data
                 buildAction
                     .Property(e => e.Id)
                     .IsRequired(true)
-                    .ValueGeneratedOnAdd();
+                    .ValueGeneratedOnAdd()
+                    .HasValueGenerator<SequentialGuidValueGenerator>();
 
                 buildAction
                     .HasOne(e => e.AcaraCyouUser)
@@ -126,7 +135,8 @@ namespace WebServer.Infrastructures.Data
                 buildAction
                     .Property(disbursementDetail => disbursementDetail.Id)
                     .IsRequired(true)
-                    .ValueGeneratedOnAdd();
+                    .ValueGeneratedOnAdd()
+                    .HasValueGenerator<SequentialGuidValueGenerator>();
 
                 buildAction
                     .HasOne(e => e.Event)
@@ -142,7 +152,8 @@ namespace WebServer.Infrastructures.Data
                 buildAction
                     .Property(poster => poster.Id)
                     .IsRequired(true)
-                    .ValueGeneratedOnAdd();
+                    .ValueGeneratedOnAdd()
+                    .HasValueGenerator<SequentialGuidValueGenerator>();
 
                 buildAction
                     .HasOne(e => e.Event)
@@ -158,7 +169,8 @@ namespace WebServer.Infrastructures.Data
                 buildAction
                     .Property(ticketCategory => ticketCategory.Id)
                     .IsRequired(true)
-                    .ValueGeneratedOnAdd();
+                    .ValueGeneratedOnAdd()
+                    .HasValueGenerator<SequentialGuidValueGenerator>();
 
                 buildAction
                     .HasOne(e => e.Event)
@@ -174,7 +186,8 @@ namespace WebServer.Infrastructures.Data
                 buildAction
                     .Property(order => order.Id)
                     .IsRequired(true)
-                    .ValueGeneratedOnAdd();
+                    .ValueGeneratedOnAdd()
+                    .HasValueGenerator<SequentialGuidValueGenerator>();
 
                 buildAction
                     .HasOne(e => e.AcaraCyouUser)
@@ -194,7 +207,8 @@ namespace WebServer.Infrastructures.Data
                 buildAction
                     .Property(invoice => invoice.Id)
                     .IsRequired(true)
-                    .ValueGeneratedOnAdd();
+                    .ValueGeneratedOnAdd()
+                    .HasValueGenerator<SequentialGuidValueGenerator>();
 
                 buildAction
                     .HasOne(e => e.Order)
@@ -217,7 +231,8 @@ namespace WebServer.Infrastructures.Data
                 buildAction
                     .Property(paymentDetail => paymentDetail.Id)
                     .IsRequired(true)
-                    .ValueGeneratedOnAdd();
+                    .ValueGeneratedOnAdd()
+                    .HasValueGenerator<SequentialGuidValueGenerator>();
 
                 buildAction
                     .HasOne(e => e.Invoice)
@@ -237,7 +252,8 @@ namespace WebServer.Infrastructures.Data
                 buildAction
                     .Property(orderItem => orderItem.Id)
                     .IsRequired(true)
-                    .ValueGeneratedOnAdd();
+                    .ValueGeneratedOnAdd()
+                    .HasValueGenerator<SequentialGuidValueGenerator>();
 
                 buildAction
                     .HasOne(e => e.TicketCategory)

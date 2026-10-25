@@ -754,15 +754,15 @@ namespace WebServer.Infrastructures.Data.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("event_id");
 
+                    b.Property<string>("FullPathUrl")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("full_path_url");
+
                     b.Property<string>("MimeType")
                         .IsRequired()
                         .HasColumnType("longtext")
                         .HasColumnName("mime_type");
-
-                    b.Property<string>("RelativePath")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("relative_path");
 
                     b.Property<int>("RowVersion")
                         .IsConcurrencyToken()

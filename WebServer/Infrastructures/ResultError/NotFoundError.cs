@@ -1,10 +1,11 @@
 ﻿using FluentResults;
+using FluentValidation;
 
 namespace WebServer.Infrastructures.ResultError
 {
     public class NotFoundError<TNotFound> : Error
     {
-        public NotFoundError(string fieldName, TNotFound notFoundValue, string? message, Severity severity) : base($"Item [{notFoundValue}] was not found")
+        public NotFoundError(string fieldName, TNotFound notFoundValue, string? message, Severity severity) : base($"Value [{notFoundValue}] was not found")
         {
             if (message is not null)
                 Message = message;

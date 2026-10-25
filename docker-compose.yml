@@ -12,6 +12,8 @@ services:
     depends_on:
       mariadb:
         condition: service_started
+    volumes:
+      - acaracyou_backend_volume:/app/UserUploads
     ports:
       - "8081:8081"
 
@@ -23,9 +25,12 @@ services:
       - acaracyou_net
     volumes:
       - acaracyou_mariadb_volume:/var/lib/mysql
+    ports:
+      - "3306:3306"
 
 volumes:
   acaracyou_mariadb_volume:
+  acaracyou_backend_volume:
   
 networks:
   acaracyou_net:

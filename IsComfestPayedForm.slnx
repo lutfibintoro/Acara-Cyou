@@ -1,7 +1,10 @@
 <Solution>
   <Folder Name="/Solution Items/">
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
     <File Path="DbDesign.drawio" />
     <File Path="docker-compose.yml" />
+    <File Path="README.md" />
   </Folder>
   <Project Path="Web/Web.csproj" />
   <Project Path="WebServer/WebServer.csproj" Id="733a71e1-e3e9-428d-8a04-c5895f085665" />

@@ -2,6 +2,7 @@
 using System.Text.Json;
 using FastEndpoints;
 using FluentResults;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.WebUtilities;
@@ -52,7 +53,7 @@ namespace WebServer.Features.GoogleLogin.KeyExchange
             {
                 errors[i] = new Infrastructures.ResponseError.Error()
                 {
-                    Severity = ((Infrastructures.ResultError.Severity)errorResults[i].Metadata["severity"]).ToString(),
+                    Severity = ((Severity)errorResults[i].Metadata["severity"]).ToString(),
                     Reason = errorResults[i].Message,
                     Code = (string)errorResults[i].Metadata["code"],
                     Name = (string)errorResults[i].Metadata["fieldName"]

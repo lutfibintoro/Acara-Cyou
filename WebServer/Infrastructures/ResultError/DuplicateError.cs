@@ -1,10 +1,11 @@
 ﻿using FluentResults;
+using FluentValidation;
 
 namespace WebServer.Infrastructures.ResultError
 {
     public class DuplicateError<TDuplicated> : Error
     {
-        public DuplicateError(string fieldName, TDuplicated duplicatedValue, string? message, Severity severity) : base($"Item [{duplicatedValue}] alread exist")
+        public DuplicateError(string fieldName, TDuplicated duplicatedValue, string? message, Severity severity) : base($"Value [{duplicatedValue}] alread exist")
         {
             if (message is not null)
                 Message = message;

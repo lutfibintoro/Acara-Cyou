@@ -2,10 +2,9 @@
 using System.Text.Json;
 using FastEndpoints;
 using FluentResults;
+using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.WebUtilities;
-using WebServer.Features.GoogleLogin.KeyExchange;
 
 namespace WebServer.Features.GoogleLogin.SignOut
 {
@@ -13,13 +12,11 @@ namespace WebServer.Features.GoogleLogin.SignOut
     {
         private readonly ILogger<SignOutRequest> _logger;
         private readonly ISender _sender;
-        private readonly string _frontendBaseAddress;
 
-        public SignOutEndpoint(ILogger<SignOutRequest> logger, ISender sender, IConfiguration configuration)
+        public SignOutEndpoint(ILogger<SignOutRequest> logger, ISender sender)
         {
             _logger = logger;
             _sender = sender;
-            _frontendBaseAddress = configuration["FrontendBaseAddress"]!;
         }
 
         public override void Configure()
@@ -38,7 +35,7 @@ namespace WebServer.Features.GoogleLogin.SignOut
                 return;
             }
 
-            RedirectHttpResult result = TypedResults.Redirect(_frontendBaseAddress, false, false);
+            var result = TypedResults.NoContent();
             await Send.ResultAsync(result);
         }
 
@@ -53,7 +50,7 @@ namespace WebServer.Features.GoogleLogin.SignOut
             {
                 errors[i] = new Infrastructures.ResponseError.Error()
                 {
-                    Severity = ((Infrastructures.ResultError.Severity)errorResults[i].Metadata["severity"]).ToString(),
+                    Severity = ((Severity)errorResults[i].Metadata["severity"]).ToString(),
                     Reason = errorResults[i].Message,
                     Code = (string)errorResults[i].Metadata["code"],
                     Name = (string)errorResults[i].Metadata["fieldName"]
