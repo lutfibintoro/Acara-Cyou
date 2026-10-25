@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Security.Claims;
 using System.Text.Json;
 using FastEndpoints;
 using FluentResults;
@@ -7,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.WebUtilities;
 using WebServer.Features.GoogleLogin.RefreshToken;
+using WebServer.Infrastructures.ResultError;
 
 namespace WebServer.Features.File.UploadFile
 {
@@ -29,7 +31,8 @@ namespace WebServer.Features.File.UploadFile
 
         public override async Task HandleAsync(UploadFileRequest req, CancellationToken ct)
         {
-            Result<UploadFileResponse> commandResult = await _sender.Send(new UploadFileCommand(req.Body.File), ct);
+            string userIdString = User.Claims.Where(claim => claim.Type == ClaimTypes.NameIdentifier).First().Value;
+            Result<UploadFileResponse> commandResult = await _sender.Send(new UploadFileCommand(userIdString, req.Body.File), ct);
 
             if (commandResult.IsFailed)
             {

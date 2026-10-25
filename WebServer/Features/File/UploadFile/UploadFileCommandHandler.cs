@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using FluentResults;
 using MediatR;
-using static FastEndpoints.Ep;
 
 namespace WebServer.Features.File.UploadFile
 {
@@ -22,7 +21,7 @@ namespace WebServer.Features.File.UploadFile
             var httpContext = _httpContextAccessor.HttpContext!;
 
             var extension = Path.GetExtension(file.FileName);
-            var uniqueFileName = $"{Guid.NewGuid()}{extension}";
+            var uniqueFileName = $"{request.userId}+{Guid.NewGuid()}{extension}";
 
             Directory.CreateDirectory("./UserUploads");
             var filePath = $"./UserUploads/{uniqueFileName}";
