@@ -6,7 +6,6 @@ namespace WebServer.Features.File.UpdateFile
     {
         public UpdateFileSummary()
         {
-            Summary = "Update a file with the given [fileName]";
             Description = "Deletes the file with the given [fileName] and stores the uploaded file under the same file name with the uploaded file's extension. Only the user whose id is on the left side of the '+' sign in the file name can update the file.";
 
             Response<UpdateFileResponse>(StatusCodes.Status200OK, contentType: "application/json");

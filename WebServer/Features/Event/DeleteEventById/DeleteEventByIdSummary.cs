@@ -6,7 +6,6 @@ namespace WebServer.Features.Event.DeleteEventById
     {
         public DeleteEventByIdSummary()
         {
-            Summary = "Soft delete an event by query string parameter [eventId]";
             Description = "Soft deletes the event with the given [eventId] by setting its isDeleted column to true. The event row is not permanently removed from the database. Only events owned by the currently authenticated user and not already deleted can be soft deleted.";
 
             Params["eventId"] = "The unique identifier (guid) of the event to soft delete";

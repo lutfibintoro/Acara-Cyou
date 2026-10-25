@@ -6,7 +6,6 @@ namespace WebServer.Features.Event.GetEventById
     {
         public GetEventByIdSummary()
         {
-            Summary = "Get an event by route parameter [eventId]";
             Description = "Returns the whole event row including its posters array for the event with the given [eventId]. Returns 404 when the event does not exist and 400 when the event has already been deleted.";
 
             Params["eventId"] = "The unique identifier (guid) of the event to load";
