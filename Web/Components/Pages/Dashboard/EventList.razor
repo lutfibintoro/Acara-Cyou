@@ -1,11 +1,5 @@
 ﻿@page "/events"
 @layout DashboardLayout
-@using System.Net.Http.Headers
-@using Blazored.LocalStorage
-@using Services.Interface
-@using System.IdentityModel.Tokens.Jwt
-@using System.Linq
-@using System.Text.Json
 @inject IApplicationNavigation AppNav
 @inject IHttpClientFactory HttpClientFactory
 @inject ILocalStorageService LocalStorageService
@@ -118,6 +112,19 @@
 	</DialogActions>
 </MudDialog>
 
+<MudDialog @bind-Visible="_eventDeleteDialogVisible" Options="new()">
+	<TitleContent>
+		<MudText Typo="Typo.h6">⚠️ Tindakan Beresiko</MudText>
+	</TitleContent>
+	<DialogContent>
+		<MudText>Menghapus event membuat anda tidak bisa mengakses dashboard event, tidak bisa scan tiket peserta dan tidak bisa mencairkan uang dari tiket</MudText>
+	</DialogContent>
+	<DialogActions>
+		<MudButton OnClick="CancelDelete" Color="Color.Primary">Batal</MudButton>
+		<MudButton Color="Color.Error" OnClick="ConfirmDelete">Tetap Hapus</MudButton>
+	</DialogActions>
+</MudDialog>
+
 <MudOverlay Visible="_overlayVisible" DarkBackground="true" Absolute="true" ZIndex="5000">
 	<MudProgressCircular Color="Color.Primary" Indeterminate="true" />
 </MudOverlay>
@@ -155,8 +162,39 @@
 	}
 
 	#region edit or remove delete
+	private bool _eventDeleteDialogVisible = false;
+	private string _confirmDeleteEvent = string.Empty;
+
+	private void ConfirmDelete()
+	{
+		_confirmDeleteEvent = "delete";
+	}
+
+	private void CancelDelete()
+	{
+		_confirmDeleteEvent = "cancel";
+	}
+
 	private async Task EventDelete(string eventId)
 	{
+		_eventDeleteDialogVisible = true;
+
+		while (true)
+		{
+			if (_confirmDeleteEvent == "delete")
+			{
+				_eventDeleteDialogVisible = false;
+				_confirmDeleteEvent = string.Empty;
+				break;
+			}
+			if (_confirmDeleteEvent == "cancel")
+			{
+				_eventDeleteDialogVisible = false;
+				_confirmDeleteEvent = string.Empty;
+				return;
+			}
+			await Task.Delay(1000);
+		}
 		HttpClient client = HttpClientFactory.CreateClient("backend");
 		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
 		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
@@ -172,7 +210,7 @@
 
 	private async Task EventEdit(string eventId)
 	{
-		
+		AppNav.NavigateToDashboard(eventId);
 	}
 	#endregion
 

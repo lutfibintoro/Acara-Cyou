@@ -8,7 +8,7 @@
         public void NavigateToPage();
         public void NavigateToEvents();
         public void NavigateToChallenge(string encodeReturnUrl);
-        public void NavigateToDashboard();
+        public void NavigateToDashboard(string eventId);
         public void NavigateToParticipants();
         public void NavigateToParticipantsCheckIn();
         public void NavigateToFormEdit();

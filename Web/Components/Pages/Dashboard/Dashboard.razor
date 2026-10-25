@@ -1,7 +1,10 @@
 ﻿@page "/dashboard"
+@layout DashboardLayout
 
 <h3>Dashboard</h3>
 
 @code {
-
+	[Parameter]
+	[SupplyParameterFromQuery(Name = "eventId")]
+	public string? EventId { get; set; }
 }

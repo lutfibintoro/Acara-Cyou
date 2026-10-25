@@ -66,22 +66,22 @@
 				}
 				@if (IsDashboardManagerEventPage())
 				{
-					<MudNavLink Match="NavLinkMatch.All" Href="/dashboard">Dashboard</MudNavLink>
+					<MudNavLink Match="NavLinkMatch.All" Href=@($"/dashboard?eventId={_eventId}")>Dashboard</MudNavLink>
 					<MudNavGroup Expanded="@(_navGroupExpanded == "peserta" ? true : false)" Title="Peserta">
-						<MudNavLink Match="NavLinkMatch.All" Href="/participants">List Peserta</MudNavLink>
-						<MudNavLink Match="NavLinkMatch.All" Href="/participant/check-in">Check-In Peserta</MudNavLink>
+						<MudNavLink Match="NavLinkMatch.All" Href=@($"/participants?eventId={_eventId}")>List Peserta</MudNavLink>
+						<MudNavLink Match="NavLinkMatch.All" Href=@($"/participant/check-in?eventId={_eventId}")>Check-In Peserta</MudNavLink>
 					</MudNavGroup>
 					<MudNavGroup Expanded="@(_navGroupExpanded == "form" ? true : false)" Title="Form">
-						<MudNavLink Match="NavLinkMatch.All" Href="/form/edit">Edit Form</MudNavLink>
-						<MudNavLink Match="NavLinkMatch.All" Href="/form/preview">Preview Form</MudNavLink>
-						<MudNavLink Match="NavLinkMatch.All" Href="/form/share">Share Form</MudNavLink>
+						<MudNavLink Match="NavLinkMatch.All" Href=@($"/form/edit?eventId={_eventId}")>Edit Form</MudNavLink>
+						<MudNavLink Match="NavLinkMatch.All" Href=@($"/form/preview?eventId={_eventId}")>Preview Form</MudNavLink>
+						<MudNavLink Match="NavLinkMatch.All" Href=@($"/form/share?eventId={_eventId}")>Share Form</MudNavLink>
 					</MudNavGroup>
 					<MudNavGroup Expanded="@(_navGroupExpanded == "tiket" ? true : false)" Title="Tiket">
-						<MudNavLink Match="NavLinkMatch.All" Href="/ticket/edit">Edit Tiket</MudNavLink>
-						<MudNavLink Match="NavLinkMatch.All" Href="/ticket/preview">Preview Tiket</MudNavLink>
-						<MudNavLink Match="NavLinkMatch.All" Href="/ticket/price">Harga Tiket</MudNavLink>
+						<MudNavLink Match="NavLinkMatch.All" Href=@($"/ticket/edit?eventId={_eventId}")>Edit Tiket</MudNavLink>
+						<MudNavLink Match="NavLinkMatch.All" Href=@($"/ticket/preview?eventId={_eventId}")>Preview Tiket</MudNavLink>
+						<MudNavLink Match="NavLinkMatch.All" Href=@($"/ticket/price?eventId={_eventId}")>Harga Tiket</MudNavLink>
 					</MudNavGroup>
-					<MudNavLink Match="NavLinkMatch.All" Href="/funds">Funds</MudNavLink>
+					<MudNavLink Match="NavLinkMatch.All" Href=@($"/funds?eventId={_eventId}")>Funds</MudNavLink>
 				}
 			</MudNavMenu>
 		</MudPaper>
@@ -108,12 +108,14 @@
 	private string? _jwt;
 
 	private string _navGroupExpanded = string.Empty;
+	private string _eventId = string.Empty;
 
 	protected override async Task OnInitializedAsync()
 	{
 		await base.OnInitializedAsync();
 
 		_navGroupExpanded = ExpandedGroup();
+		await GetEventIdFromUrl();
 		StateHasChanged();
 
 		_profilePictureUrl = await LocalStorageService.GetItemAsync<string>("profileImageUrl") ?? "/icon-192.png";
@@ -172,11 +174,22 @@
 		OverlayLight = "#1e1e2d80",
 	};
 
+	#region eventId from url
+	private async Task GetEventIdFromUrl()
+	{
+		string path = $"/{Navigation.ToBaseRelativePath(Navigation.Uri)}";
+		string miniPath = path.Split('?')[1];
+		string eventId = miniPath.Split('=')[1];
+		_eventId = eventId;
+	}
+	#endregion
+
 	#region match drawer nav link
 	private bool IsDashboardManagerEventPage()
 	{
 		string path = $"/{Navigation.ToBaseRelativePath(Navigation.Uri)}";
-		switch (path)
+		string miniPath = path.Split('?')[0];
+		switch (miniPath)
 		{
 			case "/dashboard":
 			case "/participants":
@@ -197,7 +210,8 @@
 	private bool IsDashboardEventPage()
 	{
 		string path = $"/{Navigation.ToBaseRelativePath(Navigation.Uri)}";
-		switch (path)
+		string miniPath = path.Split('?')[0];
+		switch (miniPath)
 		{
 			case "/events":
 			case "/dashboard":
@@ -219,7 +233,8 @@
 	private string ExpandedGroup()
 	{
 		string path = $"/{Navigation.ToBaseRelativePath(Navigation.Uri)}";
-		switch (path)
+		string miniPath = path.Split('?')[0];
+		switch (miniPath)
 		{
 			case "/participants":
 			case "/participant/check-in":

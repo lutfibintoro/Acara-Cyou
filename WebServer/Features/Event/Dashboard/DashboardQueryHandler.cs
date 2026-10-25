@@ -25,15 +25,19 @@ namespace WebServer.Features.Event.Dashboard
         {
             var existingEvent = await _acaraCyouDbContext.Event
                 .AsNoTracking()
-                .Where(dbEvent =>
-                    dbEvent.Id == request.EventId &&
-                    dbEvent.AcaraCyouUserId == request.UserId)
-                .Select(dbEvent => new { dbEvent.IsDeleted })
+                .Where(dbEvent => dbEvent.Id == request.EventId)
+                .Select(dbEvent => new { dbEvent.AcaraCyouUserId, dbEvent.IsDeleted })
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (existingEvent is null)
             {
                 NotFoundError<string> resultError = new("eventId", $"{request.EventId}", null, Severity.Error);
+                return Result.Fail(resultError);
+            }
+
+            if (existingEvent.AcaraCyouUserId != request.UserId)
+            {
+                ForbiddenError<string> resultError = new("eventId", $"{request.EventId}", null, Severity.Error);
                 return Result.Fail(resultError);
             }
 
