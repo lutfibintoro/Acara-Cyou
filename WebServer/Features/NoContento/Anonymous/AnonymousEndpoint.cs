@@ -1,6 +1,6 @@
 ﻿using FastEndpoints;
 
-namespace WebServer.Features.NoContent.Anonymous
+namespace WebServer.Features.NoContento.Anonymous
 {
     public class AnonymousEndpoint : Ep.NoReq.NoRes
     {

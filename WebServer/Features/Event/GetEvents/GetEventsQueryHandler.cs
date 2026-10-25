@@ -21,6 +21,7 @@ namespace WebServer.Features.Event.GetEvents
             List<GetEventsResponse> events = await _acaraCyouDbContext.Event
                 .AsNoTracking()
                 .Where(myEvent => myEvent.AcaraCyouUserId == request.UserId)
+                .Where(myEvent => myEvent.IsDeleted == false)
                 .Select(myEvent => new GetEventsResponse()
                 {
                     EventId = myEvent.Id,

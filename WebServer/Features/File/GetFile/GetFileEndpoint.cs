@@ -6,7 +6,6 @@ using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.WebUtilities;
-using WebServer.Features.File.Upload;
 using WebServer.Infrastructures.ResultError;
 
 namespace WebServer.Features.File.GetFile

@@ -155,12 +155,22 @@
 	}
 
 	#region edit or remove delete
-	private void EventDelete(string eventId)
+	private async Task EventDelete(string eventId)
 	{
-		
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+		using (HttpResponseMessage response = await client.DeleteAsync($"/api/event?eventId={eventId}"))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+			{
+				await RefreshCardEvent();
+			}
+		}
 	}
 
-	private void EventEdit(string eventId)
+	private async Task EventEdit(string eventId)
 	{
 		
 	}

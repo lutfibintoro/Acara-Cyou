@@ -1,6 +1,6 @@
 ﻿using FastEndpoints;
 
-namespace WebServer.Features.NoContent.Authenticated
+namespace WebServer.Features.NoContento.Authenticated
 {
     public class AuthenticatedEndpoint : Ep.NoReq.NoRes
     {
