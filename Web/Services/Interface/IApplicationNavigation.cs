@@ -3,7 +3,9 @@
     public interface IApplicationNavigation
     {
         public void NavigateToFitur();
-        public void NavigateToKontak();
+        public void NavigateToMasalah();
+        public void NavigateToCaraKerja();
+        public void NavigateToTestimoni();
         public void NavigateToFaq();
         public void NavigateToPage();
         public void NavigateToEvents();

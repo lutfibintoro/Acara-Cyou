@@ -282,3 +282,11 @@
 <MudScrollToTop>
 	<MudFab Size="Size.Small" IconSize="Size.Large" Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.KeyboardArrowUp" />
 </MudScrollToTop>
+
+@code {
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		AppNav.NavigateToEvents();
+	}
+}

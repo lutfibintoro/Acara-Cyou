@@ -115,10 +115,11 @@
 		await base.OnInitializedAsync();
 
 		_navGroupExpanded = ExpandedGroup();
-		await GetEventIdFromUrl();
+		EventIdFromUrl();
+		Navigation.LocationChanged += OnLocationChanged;
 		StateHasChanged();
 
-		_profilePictureUrl = await LocalStorageService.GetItemAsync<string>("profileImageUrl") ?? "/icon-192.png";
+		_profilePictureUrl = await LocalStorageService.GetItemAsync<string>("profileImageUrl") ?? "./assets/icon-192.png";
 		_refreshToken = await LocalStorageService.GetItemAsync<string>("refreshToken");
 		_jwt = await LocalStorageService.GetItemAsync<string>("jwt");
 
@@ -174,13 +175,28 @@
 		OverlayLight = "#1e1e2d80",
 	};
 
-	#region eventId from url
-	private async Task GetEventIdFromUrl()
+	#region location change
+	private void EventIdFromUrl()
 	{
 		string path = $"/{Navigation.ToBaseRelativePath(Navigation.Uri)}";
-		string miniPath = path.Split('?')[1];
-		string eventId = miniPath.Split('=')[1];
-		_eventId = eventId;
+		if (path.Contains('?'))
+		{
+			string query = path.Split('?')[1];
+			_eventId = query.Split('=')[1];
+		}
+	}
+
+	private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+	{
+		_navGroupExpanded = ExpandedGroup();
+
+		string newUrl = e.Location;
+		if (newUrl.Contains('?'))
+		{
+			string query = newUrl.Split('?')[1];
+			_eventId = query.Split('=')[1];
+		}
+		StateHasChanged();
 	}
 	#endregion
 
@@ -188,7 +204,13 @@
 	private bool IsDashboardManagerEventPage()
 	{
 		string path = $"/{Navigation.ToBaseRelativePath(Navigation.Uri)}";
-		string miniPath = path.Split('?')[0];
+		string miniPath = path;
+
+		if (path.Contains('?'))
+		{
+			miniPath = path.Split('?')[0];
+		}
+
 		switch (miniPath)
 		{
 			case "/dashboard":
@@ -210,7 +232,13 @@
 	private bool IsDashboardEventPage()
 	{
 		string path = $"/{Navigation.ToBaseRelativePath(Navigation.Uri)}";
-		string miniPath = path.Split('?')[0];
+		string miniPath = path;
+
+		if (path.Contains('?'))
+		{
+			miniPath = path.Split('?')[0];
+		}
+
 		switch (miniPath)
 		{
 			case "/events":
@@ -233,7 +261,13 @@
 	private string ExpandedGroup()
 	{
 		string path = $"/{Navigation.ToBaseRelativePath(Navigation.Uri)}";
-		string miniPath = path.Split('?')[0];
+		string miniPath = path;
+
+		if (path.Contains('?'))
+		{
+			miniPath = path.Split('?')[0];
+		}
+
 		switch (miniPath)
 		{
 			case "/participants":
@@ -329,4 +363,9 @@
 	public record RefreshTokenRequestDto(string RefreshToken);
 	public record RefreshTokenResponseDto(string JsonWebToken);
 	#endregion
+
+	public void Dispose()
+	{
+		Navigation.LocationChanged -= OnLocationChanged;
+	}
 }

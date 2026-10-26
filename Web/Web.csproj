@@ -24,7 +24,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Components\Pages\Dashboard\Form\" />
 	  <Folder Include="Components\Pages\Dashboard\Ticket\" />
 	  <Folder Include="Components\Pages\Dashboard\Participants\" />
 	</ItemGroup>
