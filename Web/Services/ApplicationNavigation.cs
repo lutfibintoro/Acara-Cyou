@@ -12,12 +12,12 @@ namespace Web.Services
             _navigation = navigation;
         }
 
-        public void NavigateToFitur() => _navigation.NavigateTo("https://acara.cyou/#fitur", true);
-        public void NavigateToMasalah() => _navigation.NavigateTo("https://acara.cyou/#masalah", true);
-        public void NavigateToCaraKerja() => _navigation.NavigateTo("https://acara.cyou/#cara-kerja", true);
-        public void NavigateToTestimoni() => _navigation.NavigateTo("https://acara.cyou/#testimoni", true);
-        public void NavigateToFaq() => _navigation.NavigateTo("https://acara.cyou/#faq", true);
-        public void NavigateToPage() => _navigation.NavigateTo("https://acara.cyou", true);
+        public void NavigateToFitur() => _navigation.NavigateTo("https://acara.cyou/#fitur");
+        public void NavigateToMasalah() => _navigation.NavigateTo("https://acara.cyou/#masalah");
+        public void NavigateToCaraKerja() => _navigation.NavigateTo("https://acara.cyou/#cara-kerja");
+        public void NavigateToTestimoni() => _navigation.NavigateTo("https://acara.cyou/#testimoni");
+        public void NavigateToFaq() => _navigation.NavigateTo("https://acara.cyou/#faq");
+        public void NavigateToPage() => _navigation.NavigateTo("https://acara.cyou");
         public void NavigateToEvents() => _navigation.NavigateTo("/events");
         public void NavigateToChallenge(string encodeReturnUrl) => _navigation.NavigateTo($"http://localhost:8081/api/google-login/challenge?returnUrl={encodeReturnUrl}", forceLoad: true);
         public void NavigateToDashboard(string eventId) => _navigation.NavigateTo($"/dashboard?eventId={eventId}");

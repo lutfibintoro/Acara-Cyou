@@ -23,6 +23,24 @@ namespace WebServer.Features.Event.UpdateEventById
 
         public async Task<Result> Handle(UpdateEventByIdCommand request, CancellationToken cancellationToken)
         {
+            var existingEvent = await _acaraCyouDbContext.Event
+                .AsNoTracking()
+                .Where(dbEvent => dbEvent.Id == request.EventId)
+                .Select(dbEvent => new { dbEvent.AcaraCyouUserId, dbEvent.IsDeleted })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (existingEvent is null)
+            {
+                NotFoundError<string> resultError = new("eventId", $"{request.EventId}", null, Severity.Error);
+                return Result.Fail(resultError);
+            }
+
+            if (existingEvent.AcaraCyouUserId != request.UserId)
+            {
+                ForbiddenError<string> resultError = new("eventId", $"{request.EventId}", null, Severity.Error);
+                return Result.Fail(resultError);
+            }
+
             Infrastructures.Data.Entities.Event? myEvent = await _acaraCyouDbContext.Event
                 .Where(dbEvent =>
                     dbEvent.Id == request.EventId &&
@@ -63,8 +81,8 @@ namespace WebServer.Features.Event.UpdateEventById
                 }
             }
 
-            ConcurrencyError<string> resultError = new("eventId", $"{request.EventId}", $"Event [{request.EventId}] was concurrently modified by another request", Severity.Error);
-            return Result.Fail(resultError);
+            ConcurrencyError<string> concurrenResultError = new("eventId", $"{request.EventId}", $"Event [{request.EventId}] was concurrently modified by another request", Severity.Error);
+            return Result.Fail(concurrenResultError);
         }
     }
 }
