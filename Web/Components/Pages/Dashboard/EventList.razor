@@ -85,14 +85,14 @@
 				<MudCardContent>
 					<MudText Typo="Typo.h6">Deskripsi Acara</MudText>
 					<MudText Typo="Typo.body2">tulis deskripsi acara / event disini</MudText>
-					<MudExRichTextEdit Height="200" Style="width: 100%" @bind-Value="_newEvent.Description" Immediate="true" Placeholder="" />
+					<RichTextEditor @bind-Content="_newEvent.Description" ToolbarOptions="ToolbarOptions.FullToolbarOptions" Placeholder="" />
 				</MudCardContent>
 			</MudCard>
 			<MudCard Style="width: 100%">
 				<MudCardContent>
 					<MudText Typo="Typo.h6">Upload Poster</MudText>
 					<MudText Typo="Typo.body2">maksimal 5 gambar dan 5MB per gambar</MudText>
-					<MudFileUpload T="IBrowserFile" FilesChanged="AddPoster" DragAndDrop="true" Accept=".png, .jpg, .webp" MaxFileSize="(1024 * 1024) * 5">
+					<MudFileUpload T="IBrowserFile" FilesChanged="AddPoster" DragAndDrop="true" Accept=".png, .jpeg, .jpg, .webp" MaxFileSize="(1024 * 1024) * 5">
 						<SelectedTemplate>
 						</SelectedTemplate>
 					</MudFileUpload>
@@ -277,6 +277,9 @@
 				}
 			}
 		}
+
+		byte[] byteTeks = Encoding.UTF8.GetBytes(_newEvent.Description);
+		_newEvent.Description = Convert.ToBase64String(byteTeks);
 
 		string jsonPoster = JsonSerializer.Serialize<List<Poster>>(_newEvent.Posters);
 		using (StringContent stringContent = new StringContent(

@@ -7,13 +7,10 @@
 		<OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
 		<RunAOTCompilation>false</RunAOTCompilation>
 		<WasmNativeStrip>false</WasmNativeStrip>
-		<NoWarn>$(NoWarn);WASM0001</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="MudExRichTextEditor" Version="*" />
-		<PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="*" />
-		<PackageReference Include="Microsoft.Data.Sqlite" Version="10.*" />
+		<PackageReference Include="Spillgebees.Blazor.RichTextEditor" Version="*" />
 		<PackageReference Include="Formaze.Blazor.MudBlazor" Version="*" />
 		<PackageReference Include="Blazored.LocalStorage" Version="*" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="*" />

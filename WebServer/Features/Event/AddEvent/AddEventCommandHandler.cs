@@ -1,4 +1,5 @@
-﻿using FluentResults;
+﻿using System.Text;
+using FluentResults;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using WebServer.Infrastructures.Data;
@@ -20,6 +21,9 @@ namespace WebServer.Features.Event.AddEvent
 
         public async Task<Result> Handle(AddEventCommand request, CancellationToken cancellationToken)
         {
+            byte[] byteTeks = Convert.FromBase64String(request.Description);
+            request.Description = Encoding.UTF8.GetString(byteTeks);
+
             bool userExists = await _acaraCyouDbContext.AcaraCyouUser
                 .AnyAsync(user => user.Id == request.UserId, cancellationToken);
 

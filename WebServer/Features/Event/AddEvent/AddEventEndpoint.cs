@@ -30,11 +30,13 @@ namespace WebServer.Features.Event.AddEvent
             string userIdString = User.Claims.Where(claim => claim.Type == ClaimTypes.NameIdentifier).First().Value;
             Guid userId = Guid.Parse(userIdString);
 
-            Result commandResult = await _sender.Send(new AddEventCommand(
-                UserId: userId,
-                Title: req.Body.Title,
-                Description: req.Body.Description,
-                Posters: req.Body.Posters), ct);
+            Result commandResult = await _sender.Send(new AddEventCommand()
+            {
+                UserId = userId,
+                Title = req.Body.Title,
+                Description = req.Body.Description,
+                Posters = req.Body.Posters
+            }, ct);
 
             if (commandResult.IsFailed)
             {
