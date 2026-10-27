@@ -151,7 +151,7 @@
 			}
 		}
 
-		if (_jwtExpiredTime < DateTime.UtcNow)
+		if ((_jwtExpiredTime - TimeSpan.FromMinutes(1)) < DateTime.UtcNow)
 		{
 			if (!await IsUserAuthenticated())
 			{
