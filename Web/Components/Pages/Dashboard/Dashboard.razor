@@ -3,9 +3,191 @@
 @inject IApplicationNavigation AppNav
 @inject IHttpClientFactory HttpClientFactory
 @inject ILocalStorageService LocalStorageService
+@inject IHttpClientFactory HttpClientFactory
 @inject NavigationManager Navigation
+@inject ISnackbar Snackbar
 
-<h3>Dashboard</h3>
+<MudPaper Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent py-15">
+	<MudContainer MaxWidth="MaxWidth.ExtraLarge">
+		<div class="event-dashboard">
+			@* ---------- STAT CARDS ---------- *@
+			<section class="stats-grid">
+				<div class="stat-card revenue">
+					<div class="stat-icon">💰</div>
+					<div class="stat-info">
+						<span class="stat-label">Total Pendapatan Bersih</span>
+						<span class="stat-value">@FormatCurrency(_dashboard.TotalNetRevenue)</span>
+					</div>
+				</div>
+
+				<div class="stat-card success">
+					<div class="stat-icon">✅</div>
+					<div class="stat-info">
+						<span class="stat-label">Pesanan Sukses</span>
+						<span class="stat-value">@_dashboard.TotalSuccessOrder.ToString("N0")</span>
+					</div>
+				</div>
+
+				<div class="stat-card pending">
+					<div class="stat-icon">⏳</div>
+					<div class="stat-info">
+						<span class="stat-label">Pesanan Pending</span>
+						<span class="stat-value">@_dashboard.TotalPendingOrder.ToString("N0")</span>
+					</div>
+				</div>
+
+				<div class="stat-card total">
+					<div class="stat-icon">📊</div>
+					<div class="stat-info">
+						<span class="stat-label">Total Pesanan</span>
+						<span class="stat-value">@((_dashboard.TotalSuccessOrder + _dashboard.TotalPendingOrder).ToString("N0"))</span>
+					</div>
+				</div>
+			</section>
+
+			@* ---------- MAIN CONTENT GRID ---------- *@
+			<div class="content-grid">
+				@* ---- TICKETS ---- *@
+				<section class="panel">
+					<div class="panel-header">
+						<h2>Tiket</h2>
+						<span class="panel-subtitle">@_dashboard.Tickets.Count kategori</span>
+					</div>
+
+					@if (_dashboard.Tickets.Any())
+					{
+						<div class="ticket-list">
+							@foreach (var ticket in _dashboard.Tickets)
+							{
+								var percent = ticket.Quota > 0 ? (ticket.BookedQuota * 100.0 / ticket.Quota) : 0;
+								var percentRounded = Math.Min(100, Math.Round(percent, 1));
+								<div class="ticket-item">
+									<div class="ticket-head">
+										<span class="ticket-name">@ticket.Category</span>
+										<span class="ticket-count">
+											<strong>@ticket.BookedQuota</strong> / @ticket.Quota
+										</span>
+									</div>
+									<div class="progress-bar">
+										<div class="progress-fill @GetProgressClass(percentRounded)"
+											 style="width: @(percentRounded.ToString(CultureInfo.InvariantCulture))%"></div>
+									</div>
+									<div class="ticket-meta">
+										<span>@percentRounded.ToString("0.#")% terjual</span>
+										<span>@(ticket.Quota - ticket.BookedQuota) tersisa</span>
+									</div>
+								</div>
+							}
+						</div>
+					}
+					else
+					{
+						<p class="empty-state">Belum ada kategori tiket.</p>
+					}
+				</section>
+
+				@* ---- CHART / DAILY REGISTRATION ---- *@
+				<section class="panel">
+					<div class="panel-header">
+						<h2>Registrasi Harian</h2>
+						<span class="panel-subtitle">10 hari terakhir</span>
+					</div>
+
+					@if (_dashboard.DailySuccessRegistrations.Any())
+					{
+						var maxVal = Math.Max(1, _dashboard.DailySuccessRegistrations.Max(d => d.TotalSuccess));
+						<div class="chart">
+							@foreach (var day in _dashboard.DailySuccessRegistrations)
+							{
+								var height = maxVal > 0 ? (day.TotalSuccess * 100.0 / maxVal) : 0;
+								var heightRounded = Math.Round(height, 1);
+								<div class="chart-col" title="@day.Date: @day.TotalSuccess registrasi">
+									<div class="chart-value">@day.TotalSuccess</div>
+									<div class="chart-bar-wrap">
+										<div class="chart-bar" style="height: @(Math.Max(2, heightRounded).ToString(CultureInfo.InvariantCulture))%"></div>
+									</div>
+									<div class="chart-label">@FormatShortDate(day.Date)</div>
+								</div>
+							}
+						</div>
+					}
+					else
+					{
+						<p class="empty-state">Belum ada data registrasi.</p>
+					}
+				</section>
+			</div>
+
+			@* ---------- BANK INFO ---------- *@
+			@if (!string.IsNullOrWhiteSpace(_event.BankAccountNumber) || !string.IsNullOrWhiteSpace(_event.BankAccountName))
+			{
+				<section class="panel bank-panel">
+					<div class="panel-header">
+						<h2>Rekening Pembayaran</h2>
+					</div>
+					<div class="bank-grid">
+						<div class="bank-item">
+							<span class="bank-label">No. Rekening</span>
+							<span class="bank-value mono">@_event.BankAccountNumber</span>
+						</div>
+						<div class="bank-item">
+							<span class="bank-label">Atas Nama</span>
+							<span class="bank-value">@_event.BankAccountName</span>
+						</div>
+					</div>
+				</section>
+			}
+
+			@* ---------- HEADER ---------- *@
+			<header class="hero">
+				@if (_event.Posters.Any())
+				{
+					<div class="poster-gallery">
+						@foreach (var poster in _event.Posters.Take(5))
+						{
+							if (!string.IsNullOrWhiteSpace(poster.FullPathUrl))
+							{
+								<img src="@poster.FullPathUrl" alt="@_event.Title" class="poster-img" loading="lazy" />
+							}
+						}
+					</div>
+				}
+
+				<div class="hero-content">
+					<div class="hero-top">
+						<span class="status-badge @(_event.IsRegistrationOpen ? "open" : "closed")">
+							<span class="dot"></span>
+							@(_event.IsRegistrationOpen ? "Pendaftaran Dibuka" : "Pendaftaran Ditutup")
+						</span>
+					</div>
+
+					<h1 class="event-title">@_event.Title</h1>
+
+					@if (!string.IsNullOrWhiteSpace(_event.Description))
+					{
+						<p class="event-desc">@((MarkupString)_event.Description)</p>
+					}
+
+					<div class="period-info">
+						<div class="period-item">
+							<span class="label">Buka</span>
+							<span class="value">@FormatDate(_event.OpenRegistrationDate)</span>
+						</div>
+						<div class="period-divider"></div>
+						<div class="period-item">
+							<span class="label">Tutup</span>
+							<span class="value">@FormatDate(_event.CloseRegistrationDate)</span>
+						</div>
+					</div>
+				</div>
+			</header>
+		</div>
+	</MudContainer>
+</MudPaper>
+
+<MudOverlay Visible="_loading" Style="height: 100dvh" DarkBackground="true" Absolute="true" ZIndex="5000">
+	<MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+</MudOverlay>
 
 @code {
 	[Parameter]
@@ -13,10 +195,23 @@
 	public string? EventId { get; set; }
 
 	private DateTime _jwtExpiredTime;
+	private bool _loading = true;
+
+	private EventDetail _event = new();
+	private EventDashboard _dashboard = new();
+
+	private string[] _chartLabels = Array.Empty<string>();
+	private List<ChartSeries<double>> _chartSeries = [];
+	private LineChartOptions _chartOptions = new();
 
 	protected override async Task OnInitializedAsync()
 	{
 		await base.OnInitializedAsync();
+
+		if (string.IsNullOrEmpty(EventId) || string.IsNullOrWhiteSpace(EventId))
+			AppNav.NavigateToPage();
+
+		await AsignVariable();
 	}
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -30,7 +225,7 @@
 			}
 		}
 
-		if (_jwtExpiredTime < DateTime.UtcNow)
+		if ((_jwtExpiredTime - TimeSpan.FromMinutes(1)) < DateTime.UtcNow)
 		{
 			if (!await IsUserAuthenticated())
 			{
@@ -39,6 +234,132 @@
 			}
 		}
 	}
+
+	#region custom deepseek helper page
+	private static string FormatDate(DateTime? dt) =>
+		dt.HasValue ? dt.Value.ToLocalTime().ToString("dd MMM yyyy, HH:mm", new CultureInfo("id-ID")) : "-";
+
+	private static string FormatShortDate(string? raw)
+	{
+		if (string.IsNullOrWhiteSpace(raw)) return "";
+		if (DateTime.TryParse(raw, out var dt))
+			return dt.ToString("dd MMM", new CultureInfo("id-ID"));
+		return raw;
+	}
+
+	private static string FormatCurrency(decimal value) =>
+		string.Format(new CultureInfo("id-ID"), "Rp {0:N0}", value);
+
+	private static string GetProgressClass(double percent) =>
+		percent >= 90 ? "critical" : percent >= 60 ? "warning" : "normal";
+	#endregion
+
+	#region init variable
+	private async Task AsignVariable()
+	{
+		_loading = true;
+		try
+		{
+			string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+			var client = HttpClientFactory.CreateClient("backend");
+			client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+			EventDetail? eventTask = await client.GetFromJsonAsync<EventDetail>($"/api/event/{EventId}");
+			EventDashboard? dashboardTask = await client.GetFromJsonAsync<EventDashboard>($"/api/event/{EventId}/dashboard");
+
+			_event = eventTask!;
+			_dashboard = dashboardTask!;
+
+			BuildChart();
+		}
+		catch (Exception ex)
+		{
+			Snackbar.Add($"Gagal memuat dashboard: {ex.Message}", Severity.Error);
+		}
+		finally
+		{
+			_loading = false;
+		}
+	}
+
+	private void BuildChart()
+	{
+		if (_dashboard == null) return;
+
+		_chartLabels = _dashboard.DailySuccessRegistrations
+			.Select(d => d.Date ?? "")
+			.ToArray();
+
+		_chartSeries = new List<ChartSeries<double>>()
+		{
+			new ChartSeries<double>()
+			{
+				Name = "Pendaftaran Sukses",
+				Data = _dashboard.DailySuccessRegistrations
+					.Select(d => (double)d.TotalSuccess)
+					.ToArray()
+			}
+		};
+
+		_chartOptions = new LineChartOptions
+		{
+			YAxisTicks = 5,
+			LineStrokeWidth = 3
+		};
+	}
+	#endregion
+	
+	#region support class or record
+	public class EventDetail
+	{
+		public Guid EventId { get; set; }
+		public Guid AcyouUserId { get; set; }
+		public string? Title { get; set; }
+		public string? Description { get; set; }
+		public string? FormTemplate { get; set; }
+		public bool IsRegistrationOpen { get; set; }
+		public DateTime? OpenRegistrationDate { get; set; }
+		public DateTime? CloseRegistrationDate { get; set; }
+		public string? BankAccountNumber { get; set; }
+		public string? BankAccountName { get; set; }
+		public bool IsDeleted { get; set; }
+		public DateTime? CreatedAt { get; set; }
+		public int RowVersion { get; set; }
+		public List<Poster> Posters { get; set; } = new();
+	}
+
+	public class Poster
+	{
+		public Guid PosterId { get; set; }
+		public string? FullPathUrl { get; set; }
+		public string? MimeType { get; set; }
+		public long ByteLength { get; set; }
+		public DateTime? CreatedAt { get; set; }
+		public int RowVersion { get; set; }
+	}
+
+	public class EventDashboard
+	{
+		public decimal TotalNetRevenue { get; set; }
+		public List<TicketCategory> Tickets { get; set; } = new();
+		public int TotalSuccessOrder { get; set; }
+		public int TotalPendingOrder { get; set; }
+		public List<DailyRegistration> DailySuccessRegistrations { get; set; } = new();
+	}
+
+	public class TicketCategory
+	{
+		public string? Category { get; set; }
+		public int Quota { get; set; }
+		public int BookedQuota { get; set; }
+	}
+
+	public class DailyRegistration
+	{
+		public string? Date { get; set; }
+		public int TotalSuccess { get; set; }
+	}
+	#endregion
 
 	#region Authenticated User
 	private async Task<bool> IsUserAuthenticated()

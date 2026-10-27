@@ -17,7 +17,7 @@
 <MudSnackbarProvider />
 
 
-<MudLayout Style="height: 100%">
+<MudLayout>
 	<MudAppBar Fixed="false" Elevation="0">
 		<MudText Color="Color.Primary" Typo="Typo.h4" HtmlTag="h1" Class="cursor-pointer" @onclick="AppNav.NavigateToPage">
 			<b>Acara</b><MudText Color="Color.Secondary" Inline="true" Typo="Typo.caption">.<b>Cyou</b></MudText>
@@ -87,7 +87,7 @@
 		</MudPaper>
 	</MudDrawer>
 
-	<MudMainContent Style="height: 100%" Class="pa-0">
+	<MudMainContent Class="pa-0">
 		@Body
 	</MudMainContent>
 
