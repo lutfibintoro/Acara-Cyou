@@ -1,9 +1,9 @@
 ﻿@page "/google-login/callback"
 @layout DashboardLayout
 @using Blazored.LocalStorage
-@inject NavigationManager NavigationManager
 @inject IHttpClientFactory HttpClientFactory
 @inject ILocalStorageService LocalStorageService
+@inject IApplicationNavigation AppNav
 
 <MudOverlay Visible="true" DarkBackground="true" Absolute="true" ZIndex="5000">
 	<MudProgressCircular Color="Color.Primary" Indeterminate="true" />
@@ -25,7 +25,7 @@
 
 		if (Key is null || ReturnUrl is null)
 		{
-			NavigationManager.NavigateTo("/");
+			AppNav.NavigateToPage();
 			return;
 		}
 		await Task.Delay(1000);
@@ -35,7 +35,7 @@
 		{
 			if (response.StatusCode != System.Net.HttpStatusCode.OK)
 			{
-				NavigationManager.NavigateTo(ReturnUrl);
+				AppNav.NavigateToUrl(ReturnUrl);
 				return;
 			}
 
@@ -44,7 +44,7 @@
 			await LocalStorageService.SetItemAsStringAsync("refreshToken", keyExchangeResponse!.RefreshToken);
 			await LocalStorageService.SetItemAsStringAsync("profileImageUrl", keyExchangeResponse!.ProfileImageUrl);
 
-			NavigationManager.NavigateTo(ReturnUrl);
+			AppNav.NavigateToUrl(ReturnUrl);
 		}
 	}
 
