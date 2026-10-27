@@ -194,7 +194,7 @@
 	[SupplyParameterFromQuery(Name = "eventId")]
 	public string? EventId { get; set; }
 
-	private DateTime _jwtExpiredTime;
+	private DateTime _jwtExpiredTime = DateTime.MinValue + TimeSpan.FromHours(1);
 	private bool _loading = true;
 
 	private EventDetail _event = new();

@@ -130,14 +130,17 @@
 </MudOverlay>
 
 @code {
-	private DateTime _jwtExpiredTime;
+	private DateTime _jwtExpiredTime = DateTime.MinValue + TimeSpan.FromHours(1);
 	private List<CardEvent> _cardEvents = [];
 	private bool _overlayVisible = false;
 
 	protected override async Task OnInitializedAsync()
 	{
 		await base.OnInitializedAsync();
+
+		_overlayVisible = true;
 		_cardEvents = await LoadCardEventListAsync();
+		_overlayVisible = false;
 	}
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
