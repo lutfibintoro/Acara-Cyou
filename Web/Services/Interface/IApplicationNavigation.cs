@@ -12,14 +12,14 @@
         public void NavigateToEvents();
         public void NavigateToChallenge(string encodeReturnUrl);
         public void NavigateToDashboard(string eventId);
-        public void NavigateToParticipants();
-        public void NavigateToParticipantsCheckIn();
-        public void NavigateToFormEdit();
-        public void NavigateToFormPreview();
-        public void NavigateToFormShare();
-        public void NavigateToTicketEdit();
-        public void NavigateToTicketPreview();
-        public void NavigateToTicketPrice();
-        public void NavigateToFunds();
+        public void NavigateToParticipants(string eventId);
+        public void NavigateToParticipantsCheckIn(string eventId);
+        public void NavigateToFormEdit(string eventId);
+        public void NavigateToFormPreview(string eventId);
+        public void NavigateToFormShare(string eventId);
+        public void NavigateToTicketEdit(string eventId);
+        public void NavigateToTicketPreview(string eventId);
+        public void NavigateToTicketPrice(string eventId);
+        public void NavigateToFunds(string eventId);
     }
 }
