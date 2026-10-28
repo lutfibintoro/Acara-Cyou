@@ -7,7 +7,7 @@
 
 <PageTitle>Event - List</PageTitle>
 
-<MudPaper Height="100%" Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent pb-15 pt-8">
+<MudPaper Height="100%" Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent pb-20 pt-8">
 	<MudContainer MaxWidth="MaxWidth.Large">
 		<MudStack Row="false" AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="4">
 			<MudFab StartIcon="@Icons.Material.Filled.Refresh" DropShadow="false" OnClick="RefreshCardEvent" />
@@ -55,9 +55,17 @@
 									</MudText>
 								</MudCardContent>
 								<MudCardActions>
-									<MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="() => EventEdit(cardEvent.EventId)">Edit</MudButton>
+									<MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="() => EventOpen(cardEvent.EventId)">Open</MudButton>
 									<MudSpacer />
-									<MudButton Variant="Variant.Text" Color="Color.Error" OnClick="() => EventDelete(cardEvent.EventId)">Delete</MudButton>
+									<MudMenu AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+										<ActivatorContent>
+											<MudIcon Icon="@Icons.Material.Filled.MoreVert" @onclick="@context.ToggleAsync" />
+										</ActivatorContent>
+										<ChildContent>
+											<MudMenuItem IconColor="Color.Info" Icon="@Icons.Material.Filled.Edit" Label="Edit" OnClick="() => EventEdit(cardEvent.EventId)" />
+											<MudMenuItem IconColor="Color.Error" Icon="@Icons.Material.Filled.Delete" Label="Delete" OnClick="() => EventDelete(cardEvent.EventId)" />
+										</ChildContent>
+									</MudMenu>
 								</MudCardActions>
 							</MudCard>
 						</MudPaper>
@@ -78,14 +86,14 @@
 				<MudCardContent>
 					<MudText Typo="Typo.h6">Nama Acara</MudText>
 					<MudText Typo="Typo.body2">tulis nama acara / event disini</MudText>
-					<MudTextField FullWidth="true" @bind-Value="_newEvent.Title" Label="" Variant="Variant.Text"></MudTextField>
+					<MudTextField FullWidth="true" @bind-Value="_newEvent.Title" Label="" Variant="Variant.Text" Placeholder="...text here"></MudTextField>
 				</MudCardContent>
 			</MudCard>
 			<MudCard Style="width: 100%">
 				<MudCardContent>
 					<MudText Typo="Typo.h6">Deskripsi Acara</MudText>
 					<MudText Typo="Typo.body2">tulis deskripsi acara / event disini</MudText>
-					<RichTextEditor @bind-Content="_newEvent.Description" ToolbarOptions="ToolbarOptions.FullToolbarOptions" Placeholder="" />
+					<RichTextEditor @bind-Content="_newEvent.Description" ToolbarOptions="ToolbarOptions.FullToolbarOptions" Placeholder="...text here" />
 				</MudCardContent>
 			</MudCard>
 			<MudCard Style="width: 100%">
@@ -109,6 +117,50 @@
 	<DialogActions>
 		<MudButton OnClick="NewEventCloseDialog" Class="px-10">Batal</MudButton>
 		<MudButton Color="Color.Primary" OnClick="SubmitNewEventAsync" Class="px-10">Kirim</MudButton>
+	</DialogActions>
+</MudDialog>
+
+<MudDialog @bind-Visible="_editDialogOpen" Options="_editDialogOption">
+	<TitleContent>
+		<MudText Typo="Typo.h6">Edit Acara</MudText>
+	</TitleContent>
+	<DialogContent>
+		<MudStack Row="false" AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="4">
+			<MudCard Style="width: 100%;">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Nama Acara</MudText>
+					<MudText Typo="Typo.body2">tulis nama acara / event disini</MudText>
+					<MudTextField FullWidth="true" @bind-Value="_eventDetail.Title" Label="" Variant="Variant.Text" Placeholder="...text here"></MudTextField>
+				</MudCardContent>
+			</MudCard>
+			<MudCard Style="width: 100%">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Deskripsi Acara</MudText>
+					<MudText Typo="Typo.body2">tulis deskripsi acara / event disini</MudText>
+					<RichTextEditor @bind-Content="_eventDetail.Description" ToolbarOptions="ToolbarOptions.FullToolbarOptions" Placeholder="...text here" />
+				</MudCardContent>
+			</MudCard>
+			<MudCard Style="width: 100%">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Update Poster</MudText>
+					<MudText Typo="Typo.body2">maksimal 5 gambar dan 5MB per gambar</MudText>
+					<MudFileUpload T="IBrowserFile" FilesChanged="EditEventAddPoster" DragAndDrop="true" Accept=".png, .jpeg, .jpg, .webp" MaxFileSize="(1024 * 1024) * 5">
+						<SelectedTemplate>
+						</SelectedTemplate>
+					</MudFileUpload>
+					<MudChipSet Size="Size.Small" T="string" AllClosable="true" OnClose="@((chip) => EditEventRemovePoster(chip.Value))">
+						@foreach (var file in _editEventPosterFiles)
+						{
+							<MudChip T=string Size="Size.Small" Value="file.Name" />
+						}
+					</MudChipSet>
+				</MudCardContent>
+			</MudCard>
+		</MudStack>
+	</DialogContent>
+	<DialogActions>
+		<MudButton OnClick="() => { _editDialogOpen = false; }" Class="px-10">Batal</MudButton>
+		<MudButton Color="Color.Primary" OnClick="async () => { await SubmitEventEdit(_eventDetail.EventId.ToString()); }" Class="px-10">Kirim</MudButton>
 	</DialogActions>
 </MudDialog>
 
@@ -164,7 +216,143 @@
 		}
 	}
 
-	#region edit or remove delete
+	#region edit event
+	private bool _editDialogOpen = false;
+	private readonly DialogOptions _editDialogOption = new();
+	private List<IBrowserFile> _editEventPosterFiles = [];
+	private EventDetail _eventDetail = new();
+
+	private void EditEventRemovePoster(string? fileName)
+	{
+		IBrowserFile? removeFile = _editEventPosterFiles.Find(file => file.Name == fileName);
+		if (removeFile is null)
+			return;
+
+		_editEventPosterFiles.Remove(removeFile);
+	}
+
+	private void EditEventAddPoster(IBrowserFile? file)
+	{
+		if (file is null)
+			return;
+
+		_editEventPosterFiles.Add(file);
+		if (_editEventPosterFiles.Count > 5)
+			_editEventPosterFiles.RemoveAt(0);
+	}
+
+	private async Task EventEdit(string eventId)
+	{
+		_overlayVisible = true;
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+		var client = HttpClientFactory.CreateClient("backend");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+		_editEventPosterFiles = [];
+		_eventDetail = await client.GetFromJsonAsync<EventDetail>($"/api/event/{eventId}") ?? new EventDetail();
+
+		_editDialogOpen = true;
+		_overlayVisible = false;
+	}
+
+	private async Task SubmitEventEdit(string eventId)
+	{
+		_overlayVisible = true;
+
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+		client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+		List<string> posterIds = [];
+		StringBuilder querstringPosterIds = new("?");
+		foreach (var posterDetail in _eventDetail.Posters)
+		{
+			string fileName = posterDetail.FullPathUrl;
+			fileName = fileName.Split('?')[1];
+			fileName = fileName.Split('=')[1];
+			using (HttpResponseMessage response = await client.DeleteAsync($"/api/file?fileName={fileName}")) { }
+			posterIds.Add(posterDetail.PosterId.ToString());
+			querstringPosterIds.Append($"posterIds={posterDetail.PosterId}&");
+		}
+
+		querstringPosterIds.Length--;
+		if (querstringPosterIds.Length > 1)
+			using (HttpResponseMessage response = await client.DeleteAsync("/api/poster/batch" + querstringPosterIds.ToString())) { }
+
+		foreach (IBrowserFile browserFile in _editEventPosterFiles)
+		{
+			using (var multipartFormContent = new MultipartFormDataContent())
+			using (Stream stream = browserFile.OpenReadStream((1024 * 1024) * 5))
+			using (StreamContent streamContent = new StreamContent(stream))
+			{
+				streamContent.Headers.ContentType = new MediaTypeHeaderValue(browserFile.ContentType);
+				multipartFormContent.Add(streamContent, "file", browserFile.Name);
+				using (HttpResponseMessage response = await client.PostAsync("/api/file", multipartFormContent))
+				{
+					if (response.StatusCode == System.Net.HttpStatusCode.Created)
+					{
+						Poster posterResponse = (await response.Content.ReadFromJsonAsync<Poster>())!;
+						using (StringContent stringContent = new StringContent(
+						$$"""
+						{
+						  "eventId": "{{_eventDetail.EventId}}",
+						  "fullPathUrl": "{{posterResponse.FullPathUrl}}",
+						  "mimeType": "{{posterResponse.MimeType}}",
+						  "byteLength": {{posterResponse.ByteLength}}
+						}
+						""", System.Text.Encoding.UTF8, "application/json"))
+						{
+							using (HttpResponseMessage responsePosterPost = await client.PostAsync("/api/poster", stringContent))
+							{
+								if (responsePosterPost.StatusCode == System.Net.HttpStatusCode.OK)
+								{
+								}
+							}
+						}
+					}
+					else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+					{
+						StateHasChanged();
+					}
+				}
+			}
+		}
+
+		byte[] byteTeksDescription = Encoding.UTF8.GetBytes(_eventDetail.Description);
+		byte[] byteTeksAfterBuy = Encoding.UTF8.GetBytes(_eventDetail.AfterBuyDescription);
+		byte[] byteTeksFormTemplate = Encoding.UTF8.GetBytes(_eventDetail.FormTemplate);
+
+		PutEvent putEvent = new()
+		{
+			Title = _eventDetail.Title,
+			Description = Convert.ToBase64String(byteTeksDescription),
+			AfterBuyDescription = Convert.ToBase64String(byteTeksAfterBuy),
+			FormTemplate = Convert.ToBase64String(byteTeksFormTemplate),
+			IsRegistrationOpen = _eventDetail.IsRegistrationOpen,
+			OpenRegistrationDate = _eventDetail.OpenRegistrationDate,
+			CloseRegistrationDate = _eventDetail.CloseRegistrationDate,
+			BankAccountNumber = _eventDetail.BankAccountNumber,
+			BankAccountName = _eventDetail.BankAccountName,
+			IsDeleted = _eventDetail.IsDeleted
+		};
+		using (HttpResponseMessage responsePosterPost = await client.PutAsJsonAsync<PutEvent>($"/api/event/{_eventDetail.EventId}", putEvent))
+		{
+			if (responsePosterPost.StatusCode == System.Net.HttpStatusCode.NoContent)
+			{
+			}
+		}
+
+
+		await RefreshCardEvent();
+		_editEventPosterFiles = [];
+		_eventDetail = new EventDetail();
+		_editDialogOpen = false;
+		_overlayVisible = false;
+	}
+	#endregion
+
+	#region open or delete
 	private bool _eventDeleteDialogVisible = false;
 	private string _confirmDeleteEvent = string.Empty;
 
@@ -211,7 +399,7 @@
 		}
 	}
 
-	private async Task EventEdit(string eventId)
+	private async Task EventOpen(string eventId)
 	{
 		AppNav.NavigateToDashboard(eventId);
 	}
@@ -343,6 +531,49 @@
 		public string FullPathUrl { get; set; } = string.Empty;
 		public string MimeType { get; set; } = string.Empty;
 		public ulong ByteLength { get; set; }
+	}
+
+	public class EventDetail
+	{
+		public Guid EventId { get; set; }
+		public Guid AcyouUserId { get; set; }
+		public string Title { get; set; } = string.Empty;
+		public string Description { get; set; } = string.Empty;
+		public string AfterBuyDescription { get; set; } = string.Empty;
+		public string FormTemplate { get; set; } = string.Empty;
+		public bool IsRegistrationOpen { get; set; }
+		public DateTime OpenRegistrationDate { get; set; }
+		public DateTime CloseRegistrationDate { get; set; }
+		public string BankAccountNumber { get; set; } = string.Empty;
+		public string BankAccountName { get; set; } = string.Empty;
+		public bool IsDeleted { get; set; }
+		public DateTime CreatedAt { get; set; }
+		public int RowVersion { get; set; }
+		public List<PosterDetail> Posters { get; set; } = [];
+	}
+
+	public class PosterDetail
+	{
+		public Guid PosterId { get; set; }
+		public string FullPathUrl { get; set; } = string.Empty;
+		public string MimeType { get; set; } = string.Empty;
+		public long ByteLength { get; set; }
+		public DateTime CreatedAt { get; set; }
+		public int RowVersion { get; set; }
+	}
+
+	public class PutEvent
+	{
+		public string Title { get; set; } = string.Empty;
+		public string Description { get; set; } = string.Empty;
+		public string AfterBuyDescription { get; set; } = string.Empty;
+		public string FormTemplate { get; set; } = string.Empty;
+		public bool IsRegistrationOpen { get; set; }
+		public DateTime OpenRegistrationDate { get; set; }
+		public DateTime CloseRegistrationDate { get; set; }
+		public string BankAccountNumber { get; set; } = string.Empty;
+		public string BankAccountName { get; set; } = string.Empty;
+		public bool IsDeleted { get; set; }
 	}
 	#endregion
 
