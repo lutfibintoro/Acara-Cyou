@@ -36,6 +36,7 @@ namespace WebServer.Features.Event.UpdateEventById
                 EventId: req.EventId,
                 Title: req.Body.Title,
                 Description: req.Body.Description,
+                AfterBuyDescription: req.Body.AfterBuyDescription,
                 FormTemplate: req.Body.FormTemplate,
                 IsRegistrationOpen: req.Body.IsRegistrationOpen,
                 OpenRegistrationDate: req.Body.OpenRegistrationDate,

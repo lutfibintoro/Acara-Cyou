@@ -13,6 +13,7 @@ namespace WebServer.Features.Event.UpdateEventById
     (
         string Title,
         string Description,
+        string AfterBuyDescription,
         string FormTemplate,
         bool IsRegistrationOpen,
         DateTime OpenRegistrationDate,

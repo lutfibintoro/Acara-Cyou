@@ -57,6 +57,7 @@ namespace WebServer.Features.Event.UpdateEventById
             {
                 myEvent.Title = request.Title;
                 myEvent.Description = request.Description;
+                myEvent.AfterBuyDescription = request.AfterBuyDescription;
                 myEvent.FormTemplate = request.FormTemplate;
                 myEvent.IsRegistrationOpen = request.IsRegistrationOpen;
                 myEvent.OpenRegistrationDate = request.OpenRegistrationDate;

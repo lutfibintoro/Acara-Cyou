@@ -29,6 +29,7 @@ namespace WebServer.Features.Event.GetEventById
                     AcaraCyouUserId = dbEvent.AcaraCyouUserId,
                     Title = dbEvent.Title,
                     Description = dbEvent.Description,
+                    AfterBuyDescription = dbEvent.AfterBuyDescription,
                     FormTemplate = dbEvent.FormTemplate,
                     IsRegistrationOpen = dbEvent.IsRegistrationOpen,
                     OpenRegistrationDate = dbEvent.OpenRegistrationDate,

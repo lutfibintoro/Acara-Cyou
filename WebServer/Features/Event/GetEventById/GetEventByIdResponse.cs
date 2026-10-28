@@ -6,6 +6,7 @@ namespace WebServer.Features.Event.GetEventById
         public Guid AcaraCyouUserId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        public string AfterBuyDescription { get; set; } = string.Empty;
         public string FormTemplate { get; set; } = string.Empty;
         public bool IsRegistrationOpen { get; set; }
         public DateTime OpenRegistrationDate { get; set; }
