@@ -7,6 +7,7 @@ namespace WebServer.Infrastructures.Data.Entities
         public Guid Id { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        public string AfterBuyDescription { get; set; } = string.Empty;
         public string FormTemplate { get; set; } = string.Empty;
         public bool IsRegistrationOpen { get; set; } = false;
         public DateTime OpenRegistrationDate { get; set; } = DateTime.UtcNow;

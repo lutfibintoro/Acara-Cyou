@@ -6,6 +6,7 @@ namespace WebServer.Infrastructures.Data.Entities
     {
         public Guid Id { get; set; }
         public string Category { get; set; } = string.Empty;
+        public string ParticipantNotice { get; set; } = string.Empty;
         public decimal PriceOne { get; set; }
         public int Quota { get; set; }
         public int BookedQuota { get; set; }
