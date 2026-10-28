@@ -30,7 +30,7 @@ namespace WebServer.Features.File.DeleteFile
         {
             string userIdString = User.Claims.Where(claim => claim.Type == ClaimTypes.NameIdentifier).First().Value;
 
-            Result commandResult = await _sender.Send(new DeleteFileCommand(userIdString, req.Body.FileName), ct);
+            Result commandResult = await _sender.Send(new DeleteFileCommand(userIdString, req.Query!.FileName), ct);
 
             if (commandResult.IsFailed)
             {

@@ -1,14 +1,16 @@
+using System.ComponentModel.DataAnnotations;
 using FastEndpoints;
 
 namespace WebServer.Features.File.DeleteFile
 {
     public record DeleteFileRequest
     (
-        [property: FromBody]
-        Body Body
+        [property: FromQuery]
+        [property: Required]
+        Query? Query
     );
 
-    public record Body
+    public record Query
     (
         string FileName
     );

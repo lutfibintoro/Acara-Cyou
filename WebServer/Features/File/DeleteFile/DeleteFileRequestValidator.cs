@@ -9,12 +9,12 @@ namespace WebServer.Features.File.DeleteFile
         {
             RuleLevelCascadeMode = CascadeMode.Continue;
 
-            RuleFor(request => request.Body)
+            RuleFor(request => request.Query)
                 .NotNull();
 
-            When(request => request.Body is not null, () =>
+            When(request => request.Query is not null, () =>
             {
-                RuleFor(request => request.Body.FileName)
+                RuleFor(request => request.Query!.FileName)
                     .Cascade(CascadeMode.Stop)
                     .NotEmpty()
                     .Must(fileName => fileName.StartsWith("./UserUploads/"))
