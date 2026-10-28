@@ -6,6 +6,7 @@
 @inject IHttpClientFactory HttpClientFactory
 @inject ILocalStorageService LocalStorageService
 @inject NavigationManager Navigation
+@implements IDisposable
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
 <MudPopoverProvider />
