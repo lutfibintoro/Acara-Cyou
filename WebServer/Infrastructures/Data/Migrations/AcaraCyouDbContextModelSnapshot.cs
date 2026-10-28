@@ -427,6 +427,11 @@ namespace WebServer.Infrastructures.Data.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("acara_cyou_user_id");
 
+                    b.Property<string>("AfterBuyDescription")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("after_buy_description");
+
                     b.Property<string>("BankAccountName")
                         .IsRequired()
                         .HasColumnType("longtext")
@@ -817,6 +822,11 @@ namespace WebServer.Infrastructures.Data.Migrations
                     b.Property<DateTime>("OpenSalesDate")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("open_sales_date");
+
+                    b.Property<string>("ParticipantNotice")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("participant_notice");
 
                     b.Property<decimal>("PriceOne")
                         .HasColumnType("decimal(65,30)")
