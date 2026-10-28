@@ -31,19 +31,21 @@ namespace WebServer.Features.Event.UpdateEventById
             string userIdString = User.Claims.Where(claim => claim.Type == ClaimTypes.NameIdentifier).First().Value;
             Guid userId = Guid.Parse(userIdString);
 
-            Result commandResult = await _sender.Send(new UpdateEventByIdCommand(
-                UserId: userId,
-                EventId: req.EventId,
-                Title: req.Body.Title,
-                Description: req.Body.Description,
-                AfterBuyDescription: req.Body.AfterBuyDescription,
-                FormTemplate: req.Body.FormTemplate,
-                IsRegistrationOpen: req.Body.IsRegistrationOpen,
-                OpenRegistrationDate: req.Body.OpenRegistrationDate,
-                CloseRegistrationDate: req.Body.CloseRegistrationDate,
-                BankAccountNumber: req.Body.BankAccountNumber,
-                BankAccountName: req.Body.BankAccountName,
-                IsDeleted: req.Body.IsDeleted), ct);
+            Result commandResult = await _sender.Send(new UpdateEventByIdCommand()
+            {
+                UserId = userId,
+                EventId = req.EventId,
+                Title = req.Body.Title,
+                Description = req.Body.Description,
+                AfterBuyDescription = req.Body.AfterBuyDescription,
+                FormTemplate = req.Body.FormTemplate,
+                IsRegistrationOpen = req.Body.IsRegistrationOpen,
+                OpenRegistrationDate = req.Body.OpenRegistrationDate,
+                CloseRegistrationDate = req.Body.CloseRegistrationDate,
+                BankAccountNumber = req.Body.BankAccountNumber,
+                BankAccountName = req.Body.BankAccountName,
+                IsDeleted = req.Body.IsDeleted
+            }, ct);
 
             if (commandResult.IsFailed)
             {

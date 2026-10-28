@@ -1,3 +1,4 @@
+using System.Text;
 using FluentResults;
 using FluentValidation;
 using MediatR;
@@ -23,6 +24,15 @@ namespace WebServer.Features.Event.UpdateEventById
 
         public async Task<Result> Handle(UpdateEventByIdCommand request, CancellationToken cancellationToken)
         {
+            byte[] byteTeks = Convert.FromBase64String(request.Description);
+            request.Description = Encoding.UTF8.GetString(byteTeks);
+
+            byteTeks = Convert.FromBase64String(request.AfterBuyDescription);
+            request.AfterBuyDescription = Encoding.UTF8.GetString(byteTeks);
+
+            byteTeks = Convert.FromBase64String(request.FormTemplate);
+            request.FormTemplate = Encoding.UTF8.GetString(byteTeks);
+
             var existingEvent = await _acaraCyouDbContext.Event
                 .AsNoTracking()
                 .Where(dbEvent => dbEvent.Id == request.EventId)
