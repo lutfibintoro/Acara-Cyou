@@ -142,6 +142,38 @@
 			</MudCard>
 			<MudCard Style="width: 100%">
 				<MudCardContent>
+					<MudText Typo="Typo.h6">Pesan</MudText>
+					<MudText Typo="Typo.body2">tulis pesan untuk peserta yang baru menyelesaikan pendaftaran disini</MudText>
+					<RichTextEditor @bind-Content="_eventDetail.AfterBuyDescription" ToolbarOptions="ToolbarOptions.FullToolbarOptions" Placeholder="...text here" />
+				</MudCardContent>
+			</MudCard>
+			<MudCard Style="width: 100%">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Akses Pendaftaran</MudText>
+					<MudText Typo="Typo.body2">buka atau tutup pendaftaran untuk event ini</MudText>
+					<MudSwitch @bind-Value="_eventDetail.IsRegistrationOpen" ThumbIcon="@(_eventDetail.IsRegistrationOpen == true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_eventDetail.IsRegistrationOpen == true ? Color.Success : Color.Error)">
+						@(_eventDetail.IsRegistrationOpen ? "pendaftaran dibuka" : "pendaftaran ditutup")
+					</MudSwitch>
+				</MudCardContent>
+			</MudCard>
+			<MudCard Style="width: 100%">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Tanggal</MudText>
+					<MudText Typo="Typo.body2">atur tanggal pendaftaran mulai dibuka</MudText>
+					<MudDatePicker @bind-Date="_dateOpenRegistration" />
+					<MudTimePicker @bind-Time="_timeOpenRegistration" />
+				</MudCardContent>
+			</MudCard>
+			<MudCard Style="width: 100%">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Tanggal</MudText>
+					<MudText Typo="Typo.body2">atur tanggal pendaftaran mulai ditutup</MudText>
+					<MudDatePicker @bind-Date="_dateCloseRegistration" />
+					<MudTimePicker @bind-Time="_timeCloseRegistration" />
+				</MudCardContent>
+			</MudCard>
+			<MudCard Style="width: 100%">
+				<MudCardContent>
 					<MudText Typo="Typo.h6">Update Poster</MudText>
 					<MudText Typo="Typo.body2">maksimal 5 gambar dan 5MB per gambar</MudText>
 					<MudFileUpload T="IBrowserFile" FilesChanged="EditEventAddPoster" DragAndDrop="true" Accept=".png, .jpeg, .jpg, .webp" MaxFileSize="(1024 * 1024) * 5">
@@ -221,6 +253,10 @@
 	private readonly DialogOptions _editDialogOption = new();
 	private List<IBrowserFile> _editEventPosterFiles = [];
 	private EventDetail _eventDetail = new();
+	private TimeSpan? _timeOpenRegistration = new TimeSpan(00, 00, 00);
+	private DateTime? _dateOpenRegistration = DateTime.UtcNow;
+	private TimeSpan? _timeCloseRegistration = new TimeSpan(00, 00, 00);
+	private DateTime? _dateCloseRegistration = DateTime.UtcNow;
 
 	private void EditEventRemovePoster(string? fileName)
 	{
@@ -250,6 +286,10 @@
 
 		_editEventPosterFiles = [];
 		_eventDetail = await client.GetFromJsonAsync<EventDetail>($"/api/event/{eventId}") ?? new EventDetail();
+		_dateOpenRegistration = _eventDetail.OpenRegistrationDate;
+		_timeOpenRegistration = _dateOpenRegistration.Value.TimeOfDay;
+		_dateCloseRegistration = _eventDetail.CloseRegistrationDate;
+		_timeCloseRegistration = _dateCloseRegistration.Value.TimeOfDay;
 
 		_editDialogOpen = true;
 		_overlayVisible = false;
@@ -322,6 +362,8 @@
 		byte[] byteTeksDescription = Encoding.UTF8.GetBytes(_eventDetail.Description);
 		byte[] byteTeksAfterBuy = Encoding.UTF8.GetBytes(_eventDetail.AfterBuyDescription);
 		byte[] byteTeksFormTemplate = Encoding.UTF8.GetBytes(_eventDetail.FormTemplate);
+		_eventDetail.OpenRegistrationDate = (_dateOpenRegistration!.Value.Date + _timeOpenRegistration) ?? _eventDetail.OpenRegistrationDate;
+		_eventDetail.CloseRegistrationDate = (_dateCloseRegistration!.Value.Date + _timeCloseRegistration) ?? _eventDetail.CloseRegistrationDate;
 
 		PutEvent putEvent = new()
 		{
