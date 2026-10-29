@@ -74,11 +74,7 @@ namespace WebServer.Features.GoogleLogin.RefreshToken
                 catch (DbUpdateConcurrencyException)
                 {
                     await Task.Delay(200);
-                    userToken = await _dbContext.AcaraCyouUserToken
-                        .Where(acaraCyouUserToken => acaraCyouUserToken.Name == "refresh-token")
-                        .Where(acaraCyouUserToken => acaraCyouUserToken.LoginProvider == "Application")
-                        .Where(acaraCyouUserToken => acaraCyouUserToken.Value == request.RefreshToken)
-                        .FirstAsync();
+                    await _dbContext.Entry(userToken).ReloadAsync();
                 }
             }
 

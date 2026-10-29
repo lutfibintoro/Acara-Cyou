@@ -181,7 +181,7 @@ namespace WebServer.Features.GoogleLogin.KeyExchange
 
             if (userToken is null)
             {
-                await _dbContext.AcaraCyouUserToken.AddAsync(new AcaraCyouUserToken()
+                AcaraCyouUserToken newUserToken = new AcaraCyouUserToken()
                 {
                     CreatedAt = DateTime.UtcNow,
                     ExpiredAt = DateTime.UtcNow.AddDays(7),
@@ -189,7 +189,8 @@ namespace WebServer.Features.GoogleLogin.KeyExchange
                     Value = refreshToken,
                     UserId = acaraCyouUser.Id,
                     LoginProvider = "Application"
-                });
+                };
+                await _dbContext.AcaraCyouUserToken.AddAsync(newUserToken);
 
                 try
                 {
@@ -198,6 +199,8 @@ namespace WebServer.Features.GoogleLogin.KeyExchange
                 }
                 catch (DbUpdateException)
                 {
+                    _dbContext.Entry(newUserToken).State = EntityState.Detached;
+
                     userToken = await _dbContext.AcaraCyouUserToken
                         .Where(acaraCyouUserToken => acaraCyouUserToken.Name == "refresh-token")
                         .Where(acaraCyouUserToken => acaraCyouUserToken.LoginProvider == "Application")
@@ -219,11 +222,7 @@ namespace WebServer.Features.GoogleLogin.KeyExchange
                 catch (DbUpdateConcurrencyException) { }
 
                 await Task.Delay(TimeSpan.FromSeconds(1));
-                userToken = await _dbContext.AcaraCyouUserToken
-                    .Where(acaraCyouUserToken => acaraCyouUserToken.Name == "refresh-token")
-                    .Where(acaraCyouUserToken => acaraCyouUserToken.LoginProvider == "Application")
-                    .Where(acaraCyouUserToken => acaraCyouUserToken.UserId == acaraCyouUser.Id)
-                    .FirstOrDefaultAsync();
+                await _dbContext.Entry(userToken!).ReloadAsync();
             }
 
             return Result.Ok<string>(userToken!.Value!);

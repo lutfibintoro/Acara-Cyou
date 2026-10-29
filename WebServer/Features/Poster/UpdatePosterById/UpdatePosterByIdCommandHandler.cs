@@ -61,9 +61,7 @@ namespace WebServer.Features.Poster.UpdatePosterById
                 catch (DbUpdateConcurrencyException)
                 {
                     await Task.Delay(200, cancellationToken);
-                    poster = await _dbContext.Poster
-                        .Where(dbPoster => dbPoster.Id == request.PosterId)
-                        .FirstAsync(cancellationToken);
+                    await _dbContext.Entry(poster).ReloadAsync(cancellationToken);
                 }
             }
 
