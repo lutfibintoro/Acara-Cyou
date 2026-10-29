@@ -44,6 +44,7 @@ namespace WebServer.Features.TicketSlice.TicketsDashboard
 
             List<TicketsDashboardResponse> tickets = await _dbContext.TicketCategory
                 .AsNoTracking()
+                .Where(dbTicket => dbTicket.EventId == myEvent.Id)
                 .Select(dbTicket => new TicketsDashboardResponse()
                 {
                     TicketId = dbTicket.Id,
