@@ -62,6 +62,7 @@ namespace WebServer
                 {
                     problemDetailsConfig.ResponseBuilder = (validationFailure, httpContext, statusCode) =>
                     {
+                        httpContext.Response.ContentType = "application/problem+json";
                         var errors = new Infrastructures.ResponseError.Error[validationFailure.Count];
                         for (int i = 0; i < validationFailure.Count; i++)
                         {
