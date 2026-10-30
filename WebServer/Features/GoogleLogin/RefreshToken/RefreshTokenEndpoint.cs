@@ -5,7 +5,6 @@ using FluentResults;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.WebUtilities;
-using WebServer.Features.GoogleLogin.SignOut;
 
 namespace WebServer.Features.GoogleLogin.RefreshToken
 {

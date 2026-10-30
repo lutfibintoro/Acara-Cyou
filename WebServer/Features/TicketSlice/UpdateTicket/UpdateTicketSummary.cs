@@ -1,5 +1,4 @@
 ﻿using FastEndpoints;
-using WebServer.Features.TicketSlice.TicketsDashboard;
 
 namespace WebServer.Features.TicketSlice.UpdateTicket
 {

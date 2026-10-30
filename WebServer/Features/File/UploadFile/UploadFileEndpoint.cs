@@ -7,8 +7,6 @@ using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.WebUtilities;
-using WebServer.Features.GoogleLogin.RefreshToken;
-using WebServer.Infrastructures.ResultError;
 
 namespace WebServer.Features.File.UploadFile
 {
