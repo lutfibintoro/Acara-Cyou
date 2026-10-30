@@ -7,10 +7,10 @@ namespace WebServer.Features.Event.GetEvents
 {
     public class GetEventsQueryHandler : IRequestHandler<GetEventsQuery, Result<List<GetEventsResponse>>>
     {
-        private readonly ILogger<GetEventsEndpoint> _logger;
+        private readonly ILogger<GetEventsQueryHandler> _logger;
         private readonly AcaraCyouDbContext _acaraCyouDbContext;
 
-        public GetEventsQueryHandler(ILogger<GetEventsEndpoint> logger, AcaraCyouDbContext acaraCyouDbContext)
+        public GetEventsQueryHandler(ILogger<GetEventsQueryHandler> logger, AcaraCyouDbContext acaraCyouDbContext)
         {
             _logger = logger;
             _acaraCyouDbContext = acaraCyouDbContext;
