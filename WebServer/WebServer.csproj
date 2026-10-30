@@ -39,6 +39,6 @@
 	<ItemGroup>
 	  <Folder Include="Features\Poster\AddPoster\" />
 	  <Folder Include="Infrastructures\Data\Migrations\" />
-	  <Folder Include="Infrastructures\PaymentGateway\Duitku\" />
+	  <Folder Include="Infrastructures\PaymentGateway\" />
 	</ItemGroup>
 </Project>

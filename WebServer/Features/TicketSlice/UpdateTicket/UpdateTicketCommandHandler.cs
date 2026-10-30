@@ -1,4 +1,5 @@
-﻿using FluentResults;
+﻿using System.Text;
+using FluentResults;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,9 @@ namespace WebServer.Features.TicketSlice.UpdateTicket
 
         public async Task<Result> Handle(UpdateTicketCommand request, CancellationToken cancellationToken)
         {
+            byte[] byteTeks = Convert.FromBase64String(request.ParticipantNotice);
+            request.ParticipantNotice = Encoding.UTF8.GetString(byteTeks);
+
             TicketCategory? ticketCategory = await _dbContext.TicketCategory
                 .Where(dbTicket => dbTicket.Id == request.TicketId)
                 .FirstOrDefaultAsync(cancellationToken);
