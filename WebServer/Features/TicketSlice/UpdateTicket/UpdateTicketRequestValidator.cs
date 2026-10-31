@@ -30,9 +30,11 @@ namespace WebServer.Features.TicketSlice.UpdateTicket
                 RuleFor(request => request.Body.IsSalesOpen)
                     .NotNull();
                 RuleFor(request => request.Body.OpenSalesDate)
-                    .NotNull();
+                    .NotNull()
+                    .LessThan(request => request.Body.CloseSalesDate);
                 RuleFor(request => request.Body.CloseSalesDate)
-                    .NotNull();
+                    .NotNull()
+                    .GreaterThan(request => request.Body.OpenSalesDate);
                 RuleFor(request => request.Body.IsDeleted)
                     .NotNull();
             });
