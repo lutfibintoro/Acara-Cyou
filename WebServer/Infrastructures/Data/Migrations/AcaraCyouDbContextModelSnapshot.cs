@@ -455,6 +455,11 @@ namespace WebServer.Infrastructures.Data.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("description");
 
+                    b.Property<string>("FormCustomUrl")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("form_custom_url");
+
                     b.Property<string>("FormTemplate")
                         .IsRequired()
                         .HasColumnType("longtext")
