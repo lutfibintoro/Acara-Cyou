@@ -52,7 +52,6 @@ namespace WebServer.Features.TicketSlice.UpdateTicket
                 ticketCategory.ParticipantNotice = request.ParticipantNotice;
                 ticketCategory.PriceOne = request.PriceOne;
                 ticketCategory.Quota = request.Quota;
-                ticketCategory.BookedQuota = request.BookedQuota;
                 ticketCategory.IsSalesOpen = request.IsSalesOpen;
                 ticketCategory.OpenSalesDate = request.OpenSalesDate;
                 ticketCategory.CloseSalesDate = request.CloseSalesDate;
