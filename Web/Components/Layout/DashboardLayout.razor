@@ -79,8 +79,8 @@
 					</MudNavGroup>
 					<MudNavGroup Expanded="@(_navGroupExpanded == "tiket" ? true : false)" Title="Tiket">
 						<MudNavLink Match="NavLinkMatch.All" Href=@($"/ticket/edit?eventId={_eventId}")>Edit Tiket</MudNavLink>
-						<MudNavLink Match="NavLinkMatch.All" Href=@($"/ticket/preview?eventId={_eventId}")>Preview Tiket</MudNavLink>
-						<MudNavLink Match="NavLinkMatch.All" Href=@($"/ticket/price?eventId={_eventId}")>Harga Tiket</MudNavLink>
+						@* <MudNavLink Match="NavLinkMatch.All" Href=@($"/ticket/preview?eventId={_eventId}")>Preview Tiket</MudNavLink>
+						<MudNavLink Match="NavLinkMatch.All" Href=@($"/ticket/price?eventId={_eventId}")>Harga Tiket</MudNavLink> *@
 					</MudNavGroup>
 					<MudNavLink Match="NavLinkMatch.All" Href=@($"/funds?eventId={_eventId}")>Funds</MudNavLink>
 				}

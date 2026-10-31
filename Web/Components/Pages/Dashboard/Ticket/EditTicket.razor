@@ -1,0 +1,540 @@
+﻿@page "/ticket/edit"
+@layout DashboardLayout
+@inject IApplicationNavigation AppNav
+@inject ILocalStorageService LocalStorageService
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager Navigation
+
+<PageTitle>Ticket - Edit</PageTitle>
+
+<MudPaper Height="100%" Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent pb-20 pt-8">
+	<MudContainer MaxWidth="MaxWidth.Large">
+		<MudTable Items="@_tickets" Hover="true" FixedHeader="true" Height="400px" PagerPosition="PagerPosition.Bottom">
+			<ToolBarContent>
+				<MudButton StartIcon="@Icons.Material.Filled.LibraryAdd" Variant="Variant.Text" Color="Color.Primary" OnClick="OpenDialogAddTicket">Tiket Baru</MudButton>
+				<MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Text" OnClick="LoadTicketsAsync"></MudButton>
+			</ToolBarContent>
+			<HeaderContent>
+				<MudTh>Id</MudTh>
+				<MudTh>Nama Tiket</MudTh>
+				<MudTh>Harga Satuan</MudTh>
+				<MudTh>Total Kuota</MudTh>
+				<MudTh>Kuota Terjual</MudTh>
+				<MudTh>Status</MudTh>
+				<MudTh>Tanggal buka</MudTh>
+				<MudTh>Tanggal tutup</MudTh>
+				<MudTh>Edit</MudTh>
+				<MudTh>Delete</MudTh>
+			</HeaderContent>
+			<RowTemplate>
+				<MudTd DataLabel="Id">
+					<MudText Typo="Typo.body2">@context.TicketId.ToString().Split('-')[0]</MudText>
+				</MudTd>
+				<MudTd DataLabel="Nama Tiket">
+					<MudText Typo="Typo.body2">@context.Category</MudText>
+				</MudTd>
+				<MudTd DataLabel="Harga Satuan">
+					<MudText Typo="Typo.body2">@context.PriceOne.ToString("C0", new CultureInfo("id-ID"))</MudText>
+				</MudTd>
+				<MudTd DataLabel="Total Kuota">
+					<MudText Typo="Typo.body2">@context.Quota</MudText>
+				</MudTd>
+				<MudTd DataLabel="Kuota Terjual">
+					<MudText Typo="Typo.body2">@context.BookedQuota</MudText>
+				</MudTd>
+				<MudTd DataLabel="Status">
+					<MudText Color="@(context.IsSalesOpen ? Color.Info : Color.Error)" Typo="Typo.body2">@(context.IsSalesOpen ? "dibuka" : "ditutup")</MudText>
+				</MudTd>
+				<MudTd DataLabel="Tanggal buka">
+					<MudText Typo="Typo.body2">@context.OpenSalesDate.ToString("yyyy-MM-dd HH:mm:ss")</MudText>
+				</MudTd>
+				<MudTd DataLabel="Tanggal tutup">
+					<MudText Typo="Typo.body2">@context.CloseSalesDate.ToString("yyyy-MM-dd HH:mm:ss")</MudText>
+				</MudTd>
+				<MudTd DataLabel="Edit">
+					<MudButton StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Text" Color="Color.Primary" OnClick="() => OpenDialogEditTicketAsync(context.TicketId)">Edit</MudButton>
+				</MudTd>
+				<MudTd DataLabel="Delete">
+					<MudButton StartIcon="@Icons.Material.Filled.Delete" Variant="Variant.Text" Color="Color.Secondary" OnClick="() => OpenDialogDeleteTicket(context.TicketId)">Delete</MudButton>
+				</MudTd>
+			</RowTemplate>
+			<PagerContent>
+				<MudTablePager PageSizeOptions="new int[] { 1, 10, 20, 30 }" />
+			</PagerContent>
+		</MudTable>
+	</MudContainer>
+</MudPaper>
+
+<MudDialog @bind-Visible="_deleteTicketDialogVisible" Options="new()">
+	<TitleContent>
+		<MudText Typo="Typo.h6">⚠️ Tindakan Beresiko</MudText>
+	</TitleContent>
+	<DialogContent>
+		<MudText>tiket yang sudah terlanjur dibeli peserta akan tetap ada dan bisa di scan</MudText>
+	</DialogContent>
+	<DialogActions>
+		<MudButton OnClick="() => _deleteTicketDialogVisible = false" Color="Color.Primary">Batal</MudButton>
+		<MudButton Color="Color.Error" OnClick="DeleteTicketAsync">Tetap Hapus</MudButton>
+	</DialogActions>
+</MudDialog>
+
+<MudDialog @bind-Visible="_addTicketDialogVisible" Options="new()">
+	<TitleContent>
+		<MudText Typo="Typo.h6">Edit Tiket</MudText>
+	</TitleContent>
+	<DialogContent>
+		<MudStack Row="false" AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="4">
+			<MudCard Style="width: 100%;">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Nama Tiket</MudText>
+					<MudText Typo="Typo.body2">tulis nama tiket / event disini</MudText>
+					<MudTextField FullWidth="true" @bind-Value="_addTicket.Category" Label="" Variant="Variant.Text" Placeholder="...text here"></MudTextField>
+				</MudCardContent>
+			</MudCard>
+			<MudCard Style="width: 100%">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Pesan</MudText>
+					<MudText Typo="Typo.body2">tulis pesan pada tiket disini, pesan akan tampil di ticket peserta</MudText>
+					<RichTextEditor @bind-Content="_addTicket.ParticipantNotice" ToolbarOptions="ToolbarOptions.FullToolbarOptions" Placeholder="...text here" />
+				</MudCardContent>
+			</MudCard>
+			<MudCard Style="width: 100%">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Harga</MudText>
+					<MudText Typo="Typo.body2">tulis 0 jika ingin ticket gratis</MudText>
+					<MudNumericField FullWidth="true" @bind-Value="_addTicket.PriceOne"></MudNumericField>
+				</MudCardContent>
+			</MudCard>
+			<MudCard Style="width: 100%">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Kuota</MudText>
+					<MudText Typo="Typo.body2">tentukan jumlah maksimal kuota tiket</MudText>
+					<MudNumericField FullWidth="true" @bind-Value="_addTicket.Quota"></MudNumericField>
+				</MudCardContent>
+			</MudCard>
+			<MudCard Style="width: 100%">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">akses tiket</MudText>
+					<MudText Typo="Typo.body2">buka atau tutup tiket untuk event ini</MudText>
+					<MudSwitch @bind-Value="_addTicket.IsSalesOpen" ThumbIcon="@(_addTicket.IsSalesOpen == true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_addTicket.IsSalesOpen == true ? Color.Info : Color.Error)">
+						@(_addTicket.IsSalesOpen ? "dibuka" : "ditutup")
+					</MudSwitch>
+				</MudCardContent>
+			</MudCard>
+			<MudCard Style="width: 100%">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Tanggal Buka</MudText>
+					<MudText Typo="Typo.body2">atur tanggal tiket mulai dibuka (tidak boleh lebih besar dari tanggal tutup)</MudText>
+					<MudDatePicker @bind-Date="_dateOpenTicketAdd" />
+					<MudTimePicker @bind-Time="_timeOpenTicketAdd" />
+				</MudCardContent>
+			</MudCard>
+			<MudCard Style="width: 100%">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Tanggal Tutup</MudText>
+					<MudText Typo="Typo.body2">atur tanggal batas waktu tiket ditutup (tidak boleh lebih besar dari tanggal buka)</MudText>
+					<MudDatePicker @bind-Date="_dateCloseTicketAdd" />
+					<MudTimePicker @bind-Time="_timeCloseTicketAdd" />
+				</MudCardContent>
+			</MudCard>
+		</MudStack>
+	</DialogContent>
+	<DialogActions>
+		<MudButton OnClick="() => _addTicketDialogVisible = false" Color="Color.Primary">Batal</MudButton>
+		<MudButton Color="Color.Error" OnClick="AddTicketAsync">Simpan</MudButton>
+	</DialogActions>
+</MudDialog>
+
+<MudDialog @bind-Visible="_editTicketDialogVisible" Options="new()">
+	<TitleContent>
+		<MudText Typo="Typo.h6">Edit Tiket</MudText>
+	</TitleContent>
+	<DialogContent>
+		<MudStack Row="false" AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="4">
+			<MudCard Style="width: 100%;">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Nama Tiket</MudText>
+					<MudText Typo="Typo.body2">tulis nama tiket / event disini</MudText>
+					<MudTextField FullWidth="true" @bind-Value="_editTicket.Category" Label="" Variant="Variant.Text" Placeholder="...text here"></MudTextField>
+				</MudCardContent>
+			</MudCard>
+			<MudCard Style="width: 100%">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Pesan</MudText>
+					<MudText Typo="Typo.body2">tulis pesan pada tiket disini, pesan akan tampil di ticket peserta</MudText>
+					<RichTextEditor @bind-Content="_editTicket.ParticipantNotice" ToolbarOptions="ToolbarOptions.FullToolbarOptions" Placeholder="...text here" />
+				</MudCardContent>
+			</MudCard>
+			<MudCard Style="width: 100%">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Harga</MudText>
+					<MudText Typo="Typo.body2">tulis 0 jika ingin ticket gratis</MudText>
+					<MudNumericField FullWidth="true" @bind-Value="_editTicket.PriceOne"></MudNumericField>
+				</MudCardContent>
+			</MudCard>
+			<MudCard Style="width: 100%">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Kuota</MudText>
+					<MudText Typo="Typo.body2">tentukan jumlah maksimal kuota tiket</MudText>
+					<MudNumericField FullWidth="true" @bind-Value="_editTicket.Quota"></MudNumericField>
+				</MudCardContent>
+			</MudCard>
+			<MudCard Style="width: 100%">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">akses tiket</MudText>
+					<MudText Typo="Typo.body2">buka atau tutup tiket untuk event ini</MudText>
+					<MudSwitch @bind-Value="_editTicket.IsSalesOpen" ThumbIcon="@(_editTicket.IsSalesOpen == true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_editTicket.IsSalesOpen == true ? Color.Info : Color.Error)">
+						@(_editTicket.IsSalesOpen ? "dibuka" : "ditutup")
+					</MudSwitch>
+				</MudCardContent>
+			</MudCard>
+			<MudCard Style="width: 100%">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Tanggal Buka</MudText>
+					<MudText Typo="Typo.body2">atur tanggal tiket mulai dibuka (tidak boleh lebih besar dari tanggal tutup)</MudText>
+					<MudDatePicker @bind-Date="_dateOpenTicket" />
+					<MudTimePicker @bind-Time="_timeOpenTicket" />
+				</MudCardContent>
+			</MudCard>
+			<MudCard Style="width: 100%">
+				<MudCardContent>
+					<MudText Typo="Typo.h6">Tanggal Tutup</MudText>
+					<MudText Typo="Typo.body2">atur tanggal batas waktu tiket ditutup (tidak boleh lebih besar dari tanggal buka)</MudText>
+					<MudDatePicker @bind-Date="_dateCloseTicket" />
+					<MudTimePicker @bind-Time="_timeCloseTicket" />
+				</MudCardContent>
+			</MudCard>
+		</MudStack>
+	</DialogContent>
+	<DialogActions>
+		<MudButton OnClick="() => _editTicketDialogVisible = false" Color="Color.Primary">Batal</MudButton>
+		<MudButton Color="Color.Error" OnClick="EditTicketAsync">Simpan</MudButton>
+	</DialogActions>
+</MudDialog>
+
+<MudOverlay Visible="_loading" Style="height: 100dvh" DarkBackground="true" Absolute="true" ZIndex="5000">
+	<MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+</MudOverlay>
+
+@code {
+	[Parameter]
+	[SupplyParameterFromQuery(Name = "eventId")]
+	public string? EventId { get; set; }
+
+	private DateTime _jwtExpiredTime = DateTime.MinValue + TimeSpan.FromHours(1);
+	private bool _loading = false;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		if (string.IsNullOrEmpty(EventId) || string.IsNullOrWhiteSpace(EventId))
+			AppNav.NavigateToPage();
+
+		await LoadTicketsAsync();
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			if (!await IsUserAuthenticated())
+			{
+				await ChallengeUnAuthenticatedAsync();
+				return;
+			}
+		}
+
+		if ((_jwtExpiredTime - TimeSpan.FromMinutes(1)) < DateTime.UtcNow)
+		{
+			if (!await IsUserAuthenticated())
+			{
+				await ChallengeUnAuthenticatedAsync();
+				return;
+			}
+		}
+	}
+
+	#region add ticket
+	private bool _addTicketDialogVisible = false;
+	private AddTicketCategory _addTicket = new();
+	private TimeSpan? _timeOpenTicketAdd = new TimeSpan(00, 00, 00);
+	private DateTime? _dateOpenTicketAdd = DateTime.UtcNow;
+	private TimeSpan? _timeCloseTicketAdd = new TimeSpan(00, 00, 00);
+	private DateTime? _dateCloseTicketAdd = DateTime.UtcNow;
+
+	public void OpenDialogAddTicket()
+	{
+		_addTicketDialogVisible = true;
+		_addTicket = new AddTicketCategory()
+		{
+			EventId = Guid.Parse(EventId!),
+			Category = string.Empty,
+			ParticipantNotice = string.Empty,
+			PriceOne = 0,
+			Quota = 0,
+			BookedQuota = 0,
+			IsSalesOpen = false,
+			OpenSalesDate = DateTime.UtcNow,
+			CloseSalesDate = DateTime.UtcNow + TimeSpan.FromMinutes(1)
+		};
+
+		_dateOpenTicketAdd = _addTicket.OpenSalesDate;
+		_timeOpenTicketAdd = _dateOpenTicketAdd.Value.TimeOfDay;
+		_dateCloseTicketAdd = _addTicket.CloseSalesDate;
+		_timeCloseTicketAdd = _dateCloseTicketAdd.Value.TimeOfDay;
+	}
+
+	public async Task AddTicketAsync()
+	{
+		_loading = true;
+
+		_addTicket.OpenSalesDate = (_dateOpenTicketAdd!.Value.Date + _timeOpenTicketAdd) ?? _addTicket.OpenSalesDate;
+		_addTicket.CloseSalesDate = (_dateCloseTicketAdd!.Value.Date + _timeCloseTicketAdd) ?? _addTicket.CloseSalesDate;
+		byte[] byteString = Encoding.UTF8.GetBytes(_addTicket.ParticipantNotice);
+		_addTicket.ParticipantNotice = Convert.ToBase64String(byteString);
+
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+		using (HttpResponseMessage response = await client.PostAsJsonAsync<AddTicketCategory>($"/api/ticket", _addTicket))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.OK)
+			{
+				await LoadTicketsAsync();
+			}
+		}
+
+		_loading = false;
+		_addTicketDialogVisible = false;
+	}
+	#endregion
+
+	#region delete ticket
+	private bool _deleteTicketDialogVisible = false;
+	private Guid _deleteTicketId;
+
+	public void OpenDialogDeleteTicket(Guid ticketId)
+	{
+		_deleteTicketDialogVisible = true;
+		_deleteTicketId = ticketId;
+	}
+
+	public async Task DeleteTicketAsync()
+	{
+		_loading = true;
+
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+		using (HttpResponseMessage response = await client.DeleteAsync($"/api/ticket/{_deleteTicketId.ToString()}"))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+			{
+				await LoadTicketsAsync();
+			}
+		}
+
+		_loading = false;
+		_deleteTicketDialogVisible = false;
+	}
+	#endregion
+
+	#region edit ticket
+	private bool _editTicketDialogVisible = false;
+	private Guid _editTicketId;
+	private EditTicketCategory _editTicket = new();
+	private TimeSpan? _timeOpenTicket = new TimeSpan(00, 00, 00);
+	private DateTime? _dateOpenTicket = DateTime.UtcNow;
+	private TimeSpan? _timeCloseTicket = new TimeSpan(00, 00, 00);
+	private DateTime? _dateCloseTicket = DateTime.UtcNow;
+
+	public void OpenDialogEditTicketAsync(Guid ticketId)
+	{
+		_editTicketDialogVisible = true;
+		_editTicketId = ticketId;
+		_editTicket = _tickets
+			.Where(ticket => ticket.TicketId == ticketId)
+			.Select(ticket => new EditTicketCategory()
+			{
+				BookedQuota = ticket.BookedQuota,
+				Category = ticket.Category,
+				CloseSalesDate = ticket.CloseSalesDate,
+				OpenSalesDate = ticket.OpenSalesDate,
+				IsDeleted = ticket.IsDeleted,
+				IsSalesOpen = ticket.IsSalesOpen,
+				ParticipantNotice = ticket.ParticipantNotice,
+				PriceOne = (int)ticket.PriceOne,
+				Quota = ticket.Quota
+			})
+			.First();
+
+		_dateOpenTicket = _editTicket.OpenSalesDate;
+		_timeOpenTicket = _dateOpenTicket.Value.TimeOfDay;
+		_dateCloseTicket = _editTicket.CloseSalesDate;
+		_timeCloseTicket = _dateCloseTicket.Value.TimeOfDay;
+	}
+
+	public async Task EditTicketAsync()
+	{
+		_loading = true;
+
+		_editTicket.OpenSalesDate = (_dateOpenTicket!.Value.Date + _timeOpenTicket) ?? _editTicket.OpenSalesDate;
+		_editTicket.CloseSalesDate = (_dateCloseTicket!.Value.Date + _timeCloseTicket) ?? _editTicket.CloseSalesDate;
+		byte[] byteString = Encoding.UTF8.GetBytes(_editTicket.ParticipantNotice);
+		_editTicket.ParticipantNotice = Convert.ToBase64String(byteString);
+
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+		using (HttpResponseMessage response = await client.PutAsJsonAsync<EditTicketCategory>($"/api/ticket/{_editTicketId}", _editTicket))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+			{
+				await LoadTicketsAsync();
+			}
+		}
+
+		_loading = false;
+		_editTicketDialogVisible = false;
+	}
+	#endregion
+
+	#region Load Ticket
+	public List<TicketCategory> _tickets = [];
+
+	public async Task LoadTicketsAsync()
+	{
+		_loading = true;
+
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+		client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+		_tickets = (await client.GetFromJsonAsync<List<TicketCategory>>($"/api/ticket/{EventId}/dashboard"))!.Where(ticket => ticket.IsDeleted == false).ToList();
+
+		_loading = false;
+	}
+	#endregion
+
+	#region support class and record
+	public class TicketCategory
+	{
+		public Guid TicketId { get; set; }
+		public Guid EventId { get; set; }
+		public string Category { get; set; } = string.Empty;
+		public string ParticipantNotice { get; set; } = string.Empty;
+		public decimal PriceOne { get; set; }
+		public int Quota { get; set; }
+		public int BookedQuota { get; set; }
+		public bool IsSalesOpen { get; set; }
+		public DateTime OpenSalesDate { get; set; }
+		public DateTime CloseSalesDate { get; set; }
+		public bool IsDeleted { get; set; }
+	}
+
+	public class EditTicketCategory
+	{
+		public string Category { get; set; } = string.Empty;
+		public string ParticipantNotice { get; set; } = string.Empty;
+		public int PriceOne { get; set; }
+		public int Quota { get; set; }
+		public int BookedQuota { get; set; }
+		public bool IsSalesOpen { get; set; }
+		public DateTime OpenSalesDate { get; set; }
+		public DateTime CloseSalesDate { get; set; }
+		public bool IsDeleted { get; set; }
+	}
+
+	public class AddTicketCategory
+	{
+		public Guid EventId { get; set; }
+		public string Category { get; set; } = string.Empty;
+		public string ParticipantNotice { get; set; } = string.Empty;
+		public int PriceOne { get; set; }
+		public int Quota { get; set; }
+		public int BookedQuota { get; set; }
+		public bool IsSalesOpen { get; set; }
+		public DateTime OpenSalesDate { get; set; }
+		public DateTime CloseSalesDate { get; set; }
+	}
+	#endregion
+
+	#region Authenticated User
+	private async Task<bool> IsUserAuthenticated()
+	{
+		string? refreshToken = await LocalStorageService.GetItemAsync<string>("refreshToken");
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+
+		if (string.IsNullOrEmpty(jwt) || string.IsNullOrEmpty(refreshToken))
+		{
+			return false;
+		}
+
+		if (await IsGetAuthenticateNoContentSuccessAsync(jwt))
+		{
+			SetJwtExpired(jwt);
+			return true;
+		}
+
+		string? newJwt = await PostRefreshTokenAsync(refreshToken);
+		if (newJwt is null)
+		{
+			return false;
+		}
+
+		await LocalStorageService.SetItemAsStringAsync("jwt", newJwt);
+		SetJwtExpired(newJwt);
+		return true;
+	}
+
+	private async Task ChallengeUnAuthenticatedAsync()
+	{
+		string returnUrl = Uri.EscapeDataString(Navigation.Uri);
+		AppNav.NavigateToChallenge(returnUrl);
+	}
+
+	private async Task<string?> PostRefreshTokenAsync(string refreshToken)
+	{
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		using (HttpResponseMessage response = await client.PostAsJsonAsync<RefreshTokenRequestDto>($"/api/google-login/refresh-token", new RefreshTokenRequestDto(refreshToken)))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.OK)
+				return (await response.Content.ReadFromJsonAsync<RefreshTokenResponseDto>())!.JsonWebToken;
+			else
+				return null;
+		}
+	}
+
+	private async Task<bool> IsGetAuthenticateNoContentSuccessAsync(string jwt)
+	{
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+		using (HttpResponseMessage response = await client.GetAsync($"/api/no-content/authenticated"))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+				return true;
+			else
+				return false;
+		}
+	}
+
+	public record RefreshTokenRequestDto(string RefreshToken);
+	public record RefreshTokenResponseDto(string JsonWebToken);
+	#endregion
+
+	#region Sets jwt expiration
+	private void SetJwtExpired(string jwt)
+	{
+		JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+		JwtSecurityToken jwtToken = handler.ReadJwtToken(jwt);
+		string expClaim = jwtToken.Claims.FirstOrDefault(cclaim => cclaim.Type == JwtRegisteredClaimNames.Exp)?.Value!;
+		long expSecond = long.Parse(expClaim);
+		_jwtExpiredTime = DateTimeOffset.FromUnixTimeSeconds(expSecond).UtcDateTime;
+	}
+	#endregion
+}
