@@ -265,10 +265,22 @@
 			client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
 			EventDetail? eventTask = await client.GetFromJsonAsync<EventDetail>($"/api/event/{EventId}");
-			EventDashboard? dashboardTask = await client.GetFromJsonAsync<EventDashboard>($"/api/event/{EventId}/dashboard");
+
+			using (HttpResponseMessage response = await client.GetAsync($"/api/event/{EventId}/dashboard"))
+			{
+				if (response.StatusCode == System.Net.HttpStatusCode.OK)
+				{
+					EventDashboard? dashboardTask = await response.Content.ReadFromJsonAsync<EventDashboard>();
+					_dashboard = dashboardTask!;
+				}
+				else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+				{
+					AppNav.NavigateToPage();
+					return;
+				}
+			}
 
 			_event = eventTask!;
-			_dashboard = dashboardTask!;
 
 			BuildChart();
 		}
@@ -308,7 +320,7 @@
 		};
 	}
 	#endregion
-	
+
 	#region support class or record
 	public class EventDetail
 	{

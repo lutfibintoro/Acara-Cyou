@@ -415,7 +415,18 @@
 		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 		client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-		_tickets = (await client.GetFromJsonAsync<List<TicketCategory>>($"/api/ticket/{EventId}/dashboard"))!.Where(ticket => ticket.IsDeleted == false).ToList();
+		using (HttpResponseMessage response = await client.GetAsync($"/api/ticket/{EventId}/dashboard"))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.OK)
+			{
+				_tickets = (await response.Content.ReadFromJsonAsync<List<TicketCategory>>())!.Where(ticket => ticket.IsDeleted == false).ToList();
+			}
+			else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+			{
+				AppNav.NavigateToPage();
+				return;
+			}
+		}
 
 		_loading = false;
 	}
