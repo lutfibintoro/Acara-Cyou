@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using Formaze.Blazor.Mudblazor.Tools;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
@@ -16,6 +17,7 @@ namespace Web
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
+            builder.Services.AddFormaze<MyFormazeStore>();
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddMudServices();
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
@@ -28,7 +30,7 @@ namespace Web
                 client.BaseAddress = new Uri("http://localhost:8081");
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             });
-
+            
             await builder.Build().RunAsync();
         }
     }
