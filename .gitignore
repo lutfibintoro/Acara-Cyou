@@ -4,8 +4,8 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 # google login secrets and env
-./WebServer/client_secret_754540576071-vk57uhgrpjnmoq0thmj68o987oqg86au.apps.googleusercontent.com.json
-./WebServer/appsettings.json
+WebServer/client_secret_754540576071-vk57uhgrpjnmoq0thmj68o987oqg86au.apps.googleusercontent.com.json
+WebServer/appsettings.json
 
 # User-specific files
 *.rsuser
