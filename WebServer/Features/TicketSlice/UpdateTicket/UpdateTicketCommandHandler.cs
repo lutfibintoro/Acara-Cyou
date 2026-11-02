@@ -3,6 +3,7 @@ using FluentResults;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens.Experimental;
 using WebServer.Infrastructures.Data;
 using WebServer.Infrastructures.Data.Entities;
 using WebServer.Infrastructures.ResultError;
@@ -44,6 +45,12 @@ namespace WebServer.Features.TicketSlice.UpdateTicket
             {
                 ForbiddenError<string> forbiddenResultError = new("userId", $"{request.UserId}", null, Severity.Error);
                 return Result.Fail(forbiddenResultError);
+            }
+
+            if ((request.PriceOne < 10000m) && (request.PriceOne != 0m))
+            {
+                ValidationError<string> validationError = new("priceOne", $"{request.UserId}", "harga minimum tiket adalah Rp10.000, ubah menjadi 0 jika ingin tiket gratis", Severity.Error);
+                return Result.Fail(validationError);
             }
 
             for (int attempt = 0; attempt < 10; attempt++)

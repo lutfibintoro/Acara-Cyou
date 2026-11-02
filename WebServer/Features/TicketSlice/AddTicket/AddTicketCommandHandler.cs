@@ -47,6 +47,12 @@ namespace WebServer.Features.TicketSlice.AddTicket
                 return Result.Fail<AddTicketResponse>(forbiddenResultError);
             }
 
+            if ((request.PriceOne < 10000m) && (request.PriceOne != 0m))
+            {
+                ValidationError<string> validationError = new("priceOne", $"{request.UserId}", "harga minimum tiket adalah Rp10.000, ubah menjadi 0 jika ingin tiket gratis", Severity.Error);
+                return Result.Fail(validationError);
+            }
+
             var ticket = new TicketCategory()
             {
                 Category = request.Category,

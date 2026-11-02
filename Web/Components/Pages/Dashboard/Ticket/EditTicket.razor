@@ -3,6 +3,7 @@
 @inject IApplicationNavigation AppNav
 @inject ILocalStorageService LocalStorageService
 @inject IHttpClientFactory HttpClientFactory
+@inject ISnackbar Snackbar
 @inject NavigationManager Navigation
 
 <PageTitle>Ticket - Edit</PageTitle>
@@ -304,6 +305,11 @@
 			{
 				await LoadTicketsAsync();
 			}
+			if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+			{
+				ProblemDetails errorValue = await response.Content.ReadFromJsonAsync<ProblemDetails>() ?? new ProblemDetails();
+				Snackbar.Add(errorValue.Errors[0].Reason, Severity.Warning);
+			}
 		}
 
 		_loading = false;
@@ -396,6 +402,11 @@
 			{
 				await LoadTicketsAsync();
 			}
+			if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+			{
+				ProblemDetails errorValue = await response.Content.ReadFromJsonAsync<ProblemDetails>() ?? new ProblemDetails();
+				Snackbar.Add(errorValue.Errors[0].Reason, Severity.Warning);
+			}
 		}
 
 		_loading = false;
@@ -472,6 +483,25 @@
 		public bool IsSalesOpen { get; set; }
 		public DateTime OpenSalesDate { get; set; }
 		public DateTime CloseSalesDate { get; set; }
+	}
+
+	public class ProblemDetails
+	{
+		public virtual int Status { get; set; }
+		public virtual string Title { get; set; } = string.Empty;
+		public virtual string Detail { get; set; } = string.Empty;
+		public virtual string Instance { get; set; } = string.Empty;
+		public virtual Uri Type { get; set; } = new Uri("about:blank");
+		public virtual string TraceId { get; set; } = string.Empty;
+		public virtual Error[] Errors { get; set; } = [];
+	}
+
+	public class Error
+	{
+		public virtual string Name { get; set; } = string.Empty;
+		public virtual string Reason { get; set; } = string.Empty;
+		public virtual string Code { get; set; } = string.Empty;
+		public virtual string Severity { get; set; } = string.Empty;
 	}
 	#endregion
 
