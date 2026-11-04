@@ -9,10 +9,10 @@ POST https://sandbox.duitku.com/webapi/api/merchant/paymentmethod/getpaymentmeth
 Accept: application/json
 Content-Type: application/json
 {
-  "merchantcode": "DS36644",
-  "amount": 30000,
-  "datetime": "2026-10-16 08:32:21",
-  "signature": "9e95b95afb13a38706a88d28f2c4340140654c8c3dc715cd773d7184f53e3833"
+  "merchantcode": "DS37415",
+  "amount": 100000,
+  "datetime": "2026-11-03 19:46:21",
+  "signature": "41d39ed80491b8d9c047a5a97aecd8dee33d1781339632ccb354b7c4dea951f3"
 }
 ###
 
