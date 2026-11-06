@@ -12,8 +12,8 @@ using WebServer.Infrastructures.Data;
 namespace WebServer.Infrastructures.Data.Migrations
 {
     [DbContext(typeof(AcaraCyouDbContext))]
-    [Migration("20261031004502_FormUrl")]
-    partial class FormUrl
+    [Migration("20261106075440_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -362,6 +362,672 @@ namespace WebServer.Infrastructures.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("WebServer.Infrastructures.Data.Entities.BankCode", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("code");
+
+                    b.Property<bool>("IsBifastSupport")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_bifast_support");
+
+                    b.Property<string>("Issuer")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("issuer");
+
+                    b.HasKey("Id")
+                        .HasName("pk_bank_code");
+
+                    b.ToTable("bank_code", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000001"),
+                            Code = "002",
+                            IsBifastSupport = true,
+                            Issuer = "Bank BRI"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000002"),
+                            Code = "008",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Mandiri"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000003"),
+                            Code = "009",
+                            IsBifastSupport = true,
+                            Issuer = "Bank BNI"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000004"),
+                            Code = "011",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Danamon"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000005"),
+                            Code = "013",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Permata"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000006"),
+                            Code = "014",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Central Asia"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000007"),
+                            Code = "016",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Maybank Indonesia"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000008"),
+                            Code = "019",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Panin"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000009"),
+                            Code = "022",
+                            IsBifastSupport = true,
+                            Issuer = "CIMB Niaga"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000000a"),
+                            Code = "023",
+                            IsBifastSupport = true,
+                            Issuer = "Bank UOB Indonesia"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000000b"),
+                            Code = "028",
+                            IsBifastSupport = true,
+                            Issuer = "Bank OCBC NISP"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000000c"),
+                            Code = "031",
+                            IsBifastSupport = true,
+                            Issuer = "Citi Bank"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000000d"),
+                            Code = "036",
+                            IsBifastSupport = true,
+                            Issuer = "Bank CCB (Ex-Bank Windu Kentjana)"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000000e"),
+                            Code = "037",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Artha Graha"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000000f"),
+                            Code = "042",
+                            IsBifastSupport = true,
+                            Issuer = "MUFG Bank"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000010"),
+                            Code = "046",
+                            IsBifastSupport = true,
+                            Issuer = "Bank DBS"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000011"),
+                            Code = "050",
+                            IsBifastSupport = true,
+                            Issuer = "Standard Chartered Bank"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000012"),
+                            Code = "054",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Capital"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000013"),
+                            Code = "061",
+                            IsBifastSupport = true,
+                            Issuer = "ANZ Indonesia"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000014"),
+                            Code = "069",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Of China Indonesia"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000015"),
+                            Code = "076",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Bumi Arta"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000016"),
+                            Code = "087",
+                            IsBifastSupport = true,
+                            Issuer = "Bank HSBC Indonesia"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000017"),
+                            Code = "095",
+                            IsBifastSupport = true,
+                            Issuer = "Bank JTrust Indonesia"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000018"),
+                            Code = "097",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Mayapada"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000019"),
+                            Code = "110",
+                            IsBifastSupport = true,
+                            Issuer = "Bank BJB"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000001a"),
+                            Code = "111",
+                            IsBifastSupport = true,
+                            Issuer = "Bank DKI"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000001b"),
+                            Code = "112",
+                            IsBifastSupport = true,
+                            Issuer = "Bank BPD DIY"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000001c"),
+                            Code = "113",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Jateng"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000001d"),
+                            Code = "115",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Jambi"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000001e"),
+                            Code = "116",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Aceh"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000001f"),
+                            Code = "117",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Sumut"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000020"),
+                            Code = "118",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Nagari"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000021"),
+                            Code = "119",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Riau Kepri"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000022"),
+                            Code = "120",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Sumsel Babel"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000023"),
+                            Code = "121",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Lampung"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000024"),
+                            Code = "122",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Kalsel"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000025"),
+                            Code = "123",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Kalbar"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000026"),
+                            Code = "124",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Kaltimtara"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000027"),
+                            Code = "125",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Kalteng"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000028"),
+                            Code = "126",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Sulselbar"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000029"),
+                            Code = "127",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Sulut Go"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000002a"),
+                            Code = "128",
+                            IsBifastSupport = true,
+                            Issuer = "Bank NTB Syariah"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000002b"),
+                            Code = "129",
+                            IsBifastSupport = true,
+                            Issuer = "Bank BPD Bali"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000002c"),
+                            Code = "131",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Maluku Malut"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000002d"),
+                            Code = "132",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Papua"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000002e"),
+                            Code = "133",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Bengkulu"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000002f"),
+                            Code = "134",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Sulteng"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000030"),
+                            Code = "135",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Sultra"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000031"),
+                            Code = "137",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Banten"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000032"),
+                            Code = "147",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Muamalat Indonesia"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000033"),
+                            Code = "151",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Mestika"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000034"),
+                            Code = "152",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Shinhan Indonesia"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000035"),
+                            Code = "153",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Sinarmas"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000036"),
+                            Code = "157",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Maspion Indonesia"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000037"),
+                            Code = "161",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Ganesha"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000038"),
+                            Code = "167",
+                            IsBifastSupport = true,
+                            Issuer = "Bank QNB Indonesia"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000039"),
+                            Code = "200",
+                            IsBifastSupport = true,
+                            Issuer = "Bank BTN"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000003a"),
+                            Code = "212",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Woori Saudara"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000003b"),
+                            Code = "213",
+                            IsBifastSupport = true,
+                            Issuer = "Bank BTPN"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000003c"),
+                            Code = "425",
+                            IsBifastSupport = true,
+                            Issuer = "Bank BJB Syariah"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000003d"),
+                            Code = "426",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Mega"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000003e"),
+                            Code = "441",
+                            IsBifastSupport = true,
+                            Issuer = "Bank KB Bukopin"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000003f"),
+                            Code = "451",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Syariah Indonesia"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000040"),
+                            Code = "472",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Jasa Jakarta"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000041"),
+                            Code = "484",
+                            IsBifastSupport = true,
+                            Issuer = "Bank KEB Hana"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000042"),
+                            Code = "485",
+                            IsBifastSupport = true,
+                            Issuer = "MNC Bank"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000043"),
+                            Code = "490",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Neo Commerce"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000044"),
+                            Code = "494",
+                            IsBifastSupport = true,
+                            Issuer = "Bank BRI Agroniaga"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000045"),
+                            Code = "498",
+                            IsBifastSupport = true,
+                            Issuer = "Bank SBI"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000046"),
+                            Code = "501",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Digital BCA"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000047"),
+                            Code = "503",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Nobu"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000048"),
+                            Code = "506",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Mega Syariah"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000049"),
+                            Code = "513",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Ina Perdana"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000004a"),
+                            Code = "517",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Panin Dubai Syariah"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000004b"),
+                            Code = "521",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Syariah Bukopin"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000004c"),
+                            Code = "523",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Sahabat Sampoerna"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000004d"),
+                            Code = "526",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Oke Indonesia"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000004e"),
+                            Code = "531",
+                            IsBifastSupport = true,
+                            Issuer = "AMAR BANK"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000004f"),
+                            Code = "535",
+                            IsBifastSupport = true,
+                            Issuer = "SEA Bank"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000050"),
+                            Code = "536",
+                            IsBifastSupport = true,
+                            Issuer = "Bank BCA Syariah"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000051"),
+                            Code = "542",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Jago"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000052"),
+                            Code = "547",
+                            IsBifastSupport = true,
+                            Issuer = "Bank BTPN Syariah"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000053"),
+                            Code = "548",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Multiarta Sentosa"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000054"),
+                            Code = "553",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Mayora"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000055"),
+                            Code = "555",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Index Selindo"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000056"),
+                            Code = "564",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Mantap"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000057"),
+                            Code = "566",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Victoria International"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000058"),
+                            Code = "567",
+                            IsBifastSupport = true,
+                            Issuer = "Allo Bank"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000059"),
+                            Code = "947",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Aladin Syariah"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000005a"),
+                            Code = "949",
+                            IsBifastSupport = true,
+                            Issuer = "Bank CTBC"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-00000000005b"),
+                            Code = "950",
+                            IsBifastSupport = true,
+                            Issuer = "Bank Commonwealth"
+                        });
+                });
+
             modelBuilder.Entity("WebServer.Infrastructures.Data.Entities.DisbursementDetail", b =>
                 {
                     b.Property<Guid>("Id")
@@ -460,7 +1126,7 @@ namespace WebServer.Infrastructures.Data.Migrations
 
                     b.Property<string>("FormCustomUrl")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("varchar(255)")
                         .HasColumnName("form_custom_url");
 
                     b.Property<string>("FormTemplate")
@@ -495,6 +1161,10 @@ namespace WebServer.Infrastructures.Data.Migrations
 
                     b.HasIndex("AcaraCyouUserId")
                         .HasDatabaseName("ix_event_acara_cyou_user_id");
+
+                    b.HasIndex("FormCustomUrl")
+                        .IsUnique()
+                        .HasDatabaseName("ix_event_form_custom_url");
 
                     b.ToTable("event", (string)null);
                 });
@@ -748,6 +1418,224 @@ namespace WebServer.Infrastructures.Data.Migrations
                     b.ToTable("payment_detail", (string)null);
                 });
 
+            modelBuilder.Entity("WebServer.Infrastructures.Data.Entities.PaymentGateway", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_payment_gateway");
+
+                    b.ToTable("payment_gateway", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("10000000-0000-0000-0000-000000000000"),
+                            Name = "Duitku"
+                        });
+                });
+
+            modelBuilder.Entity("WebServer.Infrastructures.Data.Entities.PaymentMethod", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("id");
+
+                    b.Property<string>("AdminFeeBearer")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("admin_fee_bearer");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("code");
+
+                    b.Property<decimal>("FlatFee")
+                        .HasColumnType("decimal(65,30)")
+                        .HasColumnName("flat_fee");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("name");
+
+                    b.Property<Guid>("PaymentGatewayId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("payment_gateway_id");
+
+                    b.Property<decimal>("PercentageFee")
+                        .HasColumnType("decimal(65,30)")
+                        .HasColumnName("percentage_fee");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_payment_method");
+
+                    b.HasIndex("PaymentGatewayId")
+                        .HasDatabaseName("ix_payment_method_payment_gateway_id");
+
+                    b.ToTable("payment_method", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000001"),
+                            AdminFeeBearer = "Customer",
+                            Code = "BC",
+                            FlatFee = 5000m,
+                            Name = "BCA Virtual Account",
+                            PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
+                            PercentageFee = 0m,
+                            Type = "VirtualAccount"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000002"),
+                            AdminFeeBearer = "Customer",
+                            Code = "M2",
+                            FlatFee = 3000m,
+                            Name = "Mandiri Virtual Account",
+                            PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
+                            PercentageFee = 0m,
+                            Type = "VirtualAccount"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000003"),
+                            AdminFeeBearer = "Customer",
+                            Code = "VA",
+                            FlatFee = 3000m,
+                            Name = "Maybank Virtual Account",
+                            PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
+                            PercentageFee = 0m,
+                            Type = "VirtualAccount"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000004"),
+                            AdminFeeBearer = "Customer",
+                            Code = "I1",
+                            FlatFee = 3000m,
+                            Name = "BNI Virtual Account",
+                            PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
+                            PercentageFee = 0m,
+                            Type = "VirtualAccount"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000005"),
+                            AdminFeeBearer = "Customer",
+                            Code = "B1",
+                            FlatFee = 3000m,
+                            Name = "CIMB Niaga Virtual Account",
+                            PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
+                            PercentageFee = 0m,
+                            Type = "VirtualAccount"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000006"),
+                            AdminFeeBearer = "Customer",
+                            Code = "BT",
+                            FlatFee = 0m,
+                            Name = "Permata Bank Virtual Account",
+                            PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
+                            PercentageFee = 0m,
+                            Type = "VirtualAccount"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000007"),
+                            AdminFeeBearer = "Customer",
+                            Code = "A1",
+                            FlatFee = 0m,
+                            Name = "ATM Bersama",
+                            PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
+                            PercentageFee = 0m,
+                            Type = "VirtualAccount"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000008"),
+                            AdminFeeBearer = "Customer",
+                            Code = "AG",
+                            FlatFee = 3000m,
+                            Name = "Bank Artha Graha",
+                            PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
+                            PercentageFee = 0m,
+                            Type = "VirtualAccount"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000009"),
+                            AdminFeeBearer = "Customer",
+                            Code = "NC",
+                            FlatFee = 3000m,
+                            Name = "Bank Neo Commerce / BNC",
+                            PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
+                            PercentageFee = 0m,
+                            Type = "VirtualAccount"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-00000000000a"),
+                            AdminFeeBearer = "Customer",
+                            Code = "BR",
+                            FlatFee = 3000m,
+                            Name = "BRIVA",
+                            PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
+                            PercentageFee = 0m,
+                            Type = "VirtualAccount"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-00000000000b"),
+                            AdminFeeBearer = "Customer",
+                            Code = "S1",
+                            FlatFee = 3000m,
+                            Name = "Bank Sahabat Sampoerna",
+                            PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
+                            PercentageFee = 0m,
+                            Type = "VirtualAccount"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-00000000000c"),
+                            AdminFeeBearer = "Customer",
+                            Code = "BV",
+                            FlatFee = 3000m,
+                            Name = "BSI Virtual Account",
+                            PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
+                            PercentageFee = 0m,
+                            Type = "VirtualAccount"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-00000000000d"),
+                            AdminFeeBearer = "Merchant",
+                            Code = "NQ",
+                            FlatFee = 0m,
+                            Name = "Nobu",
+                            PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
+                            PercentageFee = 0m,
+                            Type = "Qris"
+                        });
+                });
+
             modelBuilder.Entity("WebServer.Infrastructures.Data.Entities.Poster", b =>
                 {
                     b.Property<Guid>("Id")
@@ -996,6 +1884,18 @@ namespace WebServer.Infrastructures.Data.Migrations
                     b.Navigation("Invoice");
                 });
 
+            modelBuilder.Entity("WebServer.Infrastructures.Data.Entities.PaymentMethod", b =>
+                {
+                    b.HasOne("WebServer.Infrastructures.Data.Entities.PaymentGateway", "PaymentGateway")
+                        .WithMany("PaymentMethods")
+                        .HasForeignKey("PaymentGatewayId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_payment_method_payment_gateway_payment_gateway_id");
+
+                    b.Navigation("PaymentGateway");
+                });
+
             modelBuilder.Entity("WebServer.Infrastructures.Data.Entities.Poster", b =>
                 {
                     b.HasOne("WebServer.Infrastructures.Data.Entities.Event", "Event")
@@ -1046,6 +1946,11 @@ namespace WebServer.Infrastructures.Data.Migrations
                     b.Navigation("Invoice");
 
                     b.Navigation("OrderItems");
+                });
+
+            modelBuilder.Entity("WebServer.Infrastructures.Data.Entities.PaymentGateway", b =>
+                {
+                    b.Navigation("PaymentMethods");
                 });
 
             modelBuilder.Entity("WebServer.Infrastructures.Data.Entities.TicketCategory", b =>
