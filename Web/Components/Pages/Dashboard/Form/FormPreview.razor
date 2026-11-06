@@ -1,0 +1,547 @@
+﻿@page "/form/preview"
+@layout DashboardLayout
+@inject IApplicationNavigation AppNav
+@inject ILocalStorageService LocalStorageService
+@inject IHttpClientFactory HttpClientFactory
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+
+<PageTitle>form - preview</PageTitle>
+
+@if (_noMoreTicket || _eventWasClosed)
+{
+	<MudPaper Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent py-15">
+		<MudContainer MaxWidth="MaxWidth.Medium">
+			<MudPaper Height="100%" Width="100%" Outlined="false" Elevation="0" Class="shades transparent pa-5">
+				<MudText Typo="Typo.h4" Align="Align.Center">Mohon maaf pendaftaran untuk event ini sudah ditutup atau kuota tiket sudah habis</MudText>
+				<MudButton Variant="Variant.Filled" Color="Color.Secondary" Href="https://acara.cyou">Kembali</MudButton>
+			</MudPaper>
+		</MudContainer>
+	</MudPaper>
+}
+else
+{
+	<MudPaper Height="100%" Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent pb-3 pt-8">
+		<MudContainer MaxWidth="MaxWidth.Large">
+			<MudPaper Height="100%" Width="100%" Outlined="false" Elevation="0" Class="shades transparent">
+				<MudText Typo="Typo.body1">@((MarkupString)_eventDetail.Description)</MudText>
+			</MudPaper>
+		</MudContainer>
+	</MudPaper>
+
+	<MudPaper Height="100%" Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent pb-3 pt-3">
+		<MudContainer MaxWidth="MaxWidth.Large">
+			<MudPaper Width="100%" Outlined="true" Square="false" Elevation="0" Class="pa-6">
+				<MudStack Row="false" AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="5">
+					<MudPaper Width="100%" Outlined="false" Square="false" Elevation="0">
+						<MudText Typo="Typo.body1">setelah melakukan pembayaran, tiket akan terkirim ke email <strong><b>@_userEmail</b></strong> cek kotak masuk (Inbox) atau folder Spam/Junk jika Anda tidak menemukannya.</MudText>
+					</MudPaper>
+					<MudPaper Width="100%" Outlined="false" Square="false" Elevation="0">
+						<MudGrid Justify="Justify.FlexStart" Spacing="4">
+							<MudItem xs="12" sm="4">
+								<MudSelect FullWidth="false" T="string" Value="TicketSelectValue" ValueChanged="TicketSelectAction" Label="pilih tiket">
+									@foreach (TicketCategory ticketCategory in _ticketCategory)
+									{
+										<MudSelectItem Value="@ticketCategory.TicketId.ToString()">
+											<MudText Typo="Typo.body1">
+												@ticketCategory.Category <MudText Inline="true" Typo="Typo.caption" Color="Color.Error">@(((int)(ticketCategory.PriceOne)) == 0 ? "gratis" : $"{(int)(ticketCategory.PriceOne)}")</MudText>
+											</MudText>
+										</MudSelectItem>
+									}
+								</MudSelect>
+							</MudItem>
+							@if (TicketIsSelected && (IsTicketFree == false))
+							{
+								<MudItem xs="12" sm="4">
+									<MudSelect FullWidth="false" T="string" Value="TypeSelectValue" ValueChanged="TypeSelectAction" Label="pilih tipe pembayaran">
+										@foreach (string type in InfoPayment.PaymentMethods.Select(g => g.Type).Distinct().ToArray())
+										{
+											<MudSelectItem Value="@type">@type</MudSelectItem>
+										}
+									</MudSelect>
+								</MudItem>
+							}
+							@if (TypeIsSelected && (IsTicketFree == false))
+							{
+								<MudItem xs="12" sm="4">
+									<MudSelect FullWidth="false" T="string" Value="MethodSelectValue" ValueChanged="MethodSelectAction" Label="pilih metode pembayaran">
+										@foreach (PaymentMethod paymentMethod in SelectPaymentMethod)
+										{
+											<MudSelectItem Value="@paymentMethod.PaymentMethodId.ToString()">
+												<MudText Typo="Typo.body1">
+													@paymentMethod.Name <MudText Inline="true" Typo="Typo.caption" Color="Color.Error">@((int)(paymentMethod.FlatFee + paymentMethod.ApplicationFlatFee)) + @paymentMethod.PercentageFee.ToString("F2")%</MudText>
+												</MudText>
+											</MudSelectItem>
+										}
+									</MudSelect>
+								</MudItem>
+							}
+						</MudGrid>
+					</MudPaper>
+					<MudPaper Width="100%" Outlined="false" Square="false" Elevation="0">
+						@if (MethodIsSelected && (IsTicketFree == false))
+						{
+							<MudTable Items="PriceDetail" Hover="false" Elevation="0" Outlined="true">
+								<HeaderContent>
+									<MudTh>Harga Tiket</MudTh>
+									<MudTh>Biaya Admin</MudTh>
+									<MudTh>Total</MudTh>
+								</HeaderContent>
+								<RowTemplate>
+									<MudTd DataLabel="Harga Tiket">@context.TicketPrice.ToString("C0", new CultureInfo("id-ID"))</MudTd>
+									<MudTd DataLabel="Biaya Admin">@context.FlatFee.ToString("C0", new CultureInfo("id-ID")) + @context.PercentageFee.ToString("F2")%</MudTd>
+									<MudTd DataLabel="Total">@context.Total.ToString("C0", new CultureInfo("id-ID"))</MudTd>
+								</RowTemplate>
+							</MudTable>
+						}
+					</MudPaper>
+				</MudStack>
+			</MudPaper>
+		</MudContainer>
+	</MudPaper>
+
+	<MudPaper Height="100%" Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent pb-20 pt-3">
+		<MudContainer MaxWidth="MaxWidth.Large">
+			<FormazeComponent T="FormTemplateModel"
+							  Key="@EventId"
+							  Model="@MyModel"
+							  EditMode="false" />
+		</MudContainer>
+	</MudPaper>
+}
+
+
+<MudOverlay Visible="_loading" Style="height: 100dvh" DarkBackground="true" Absolute="true" ZIndex="5000">
+	<MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+</MudOverlay>
+
+@code {
+	[Parameter]
+	[SupplyParameterFromQuery(Name = "eventId")]
+	public string? EventId { get; set; }
+
+	private DateTime _jwtExpiredTime = DateTime.MinValue + TimeSpan.FromHours(1);
+	private bool _loading = false;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		if (string.IsNullOrEmpty(EventId) || string.IsNullOrWhiteSpace(EventId))
+			AppNav.NavigateToPage();
+
+		await PermittedUsersAsync();
+		await LoadEvent();
+		await LoadEventTickets();
+		await SetUserEmailAsync();
+		await LoadPaymentMethodAsync();
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			if (!await IsUserAuthenticated())
+			{
+				await ChallengeUnAuthenticatedAsync();
+				return;
+			}
+		}
+
+		if ((_jwtExpiredTime - TimeSpan.FromMinutes(1)) < DateTime.UtcNow)
+		{
+			if (!await IsUserAuthenticated())
+			{
+				await ChallengeUnAuthenticatedAsync();
+				return;
+			}
+		}
+	}
+
+	#region payment method select
+	public bool MethodIsSelected = false;
+	public string MethodSelectValue = string.Empty;
+	public (int TicketPrice, int FlatFee, decimal PercentageFee, decimal Total)[] PriceDetail = [];
+
+	public void MethodSelectAction(string newValue)
+	{
+		MethodIsSelected = true;
+		MethodSelectValue = newValue;
+
+		PaymentMethod paymentMethod = InfoPayment.PaymentMethods.Where(tc => tc.PaymentMethodId == Guid.Parse(newValue)).First();
+		
+		decimal ticketPrice = TicketSelect.PriceOne;
+		decimal flatFee = paymentMethod.FlatFee + paymentMethod.ApplicationFlatFee;
+		decimal percentageFee = paymentMethod.PercentageFee;
+
+		decimal plusPercentage = ticketPrice * (percentageFee / 100m);
+		decimal total = ticketPrice + plusPercentage + flatFee;
+
+		PriceDetail = [
+			(TicketPrice: (int)ticketPrice, FlatFee: (int)flatFee, PercentageFee: percentageFee, Total: total)
+		];
+	}
+	#endregion
+
+	#region payment type select
+	public bool TypeIsSelected = false;
+	public string TypeSelectValue = string.Empty;
+	public PaymentMethod[] SelectPaymentMethod = [];
+
+	public void TypeSelectAction(string newValue)
+	{
+		TypeIsSelected = true;
+		TypeSelectValue = newValue;
+		SelectPaymentMethod = InfoPayment.PaymentMethods.Where(paymentMethod => paymentMethod.Type == TypeSelectValue).ToArray();
+
+		MethodIsSelected = false;
+		MethodSelectValue = string.Empty;
+	}
+	#endregion
+
+	#region ticket select
+	public bool TicketIsSelected = false;
+	public bool IsTicketFree = false;
+	public string TicketSelectValue = string.Empty;
+	public TicketCategory TicketSelect = new();
+
+	public void TicketSelectAction(string newValue)
+	{
+		TicketIsSelected = true;
+		TicketSelectValue = newValue;
+
+		TicketSelect = _ticketCategory.Where(tc => tc.TicketId == Guid.Parse(newValue)).First();
+		if (((int)TicketSelect.PriceOne) == 0)
+		{
+			IsTicketFree = true;
+		}
+		else
+		{
+			IsTicketFree = false;
+		}
+	}
+	#endregion
+
+	#region payment method
+	public PaymentInfo InfoPayment = new();
+
+	private async Task LoadPaymentMethodAsync()
+	{
+		_loading = true;
+
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+		var client = HttpClientFactory.CreateClient("backend");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+		using (HttpResponseMessage response = await client.GetAsync($"/api/payment"))
+		{
+			if (response.StatusCode != System.Net.HttpStatusCode.OK)
+			{
+				string errorMessage = string.Empty;
+				ProblemDetails errorValue = await response.Content.ReadFromJsonAsync<ProblemDetails>() ?? new ProblemDetails();
+				if (string.IsNullOrEmpty(errorValue.Detail) || string.IsNullOrWhiteSpace(errorValue.Detail))
+					errorMessage = errorValue.Errors[0].Reason;
+				else
+					errorMessage = errorValue.Detail;
+
+				Snackbar.Add(errorMessage, Severity.Error);
+				return;
+			}
+
+			InfoPayment = await response.Content.ReadFromJsonAsync<PaymentInfo>() ?? InfoPayment;
+		}
+
+		_loading = false;
+	}
+	#endregion
+
+	#region event load
+	public EventDetail _eventDetail = new();
+	private bool _eventWasClosed = false;
+
+	public async Task LoadEvent()
+	{
+		_loading = true;
+
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+		var client = HttpClientFactory.CreateClient("backend");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+		using (HttpResponseMessage response = await client.GetAsync($"/api/event/{EventId}"))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.OK)
+			{
+				_eventDetail = (await response.Content.ReadFromJsonAsync<EventDetail>())!;
+			}
+			else
+			{
+				ProblemDetails errorValue = await response.Content.ReadFromJsonAsync<ProblemDetails>() ?? new ProblemDetails();
+				Snackbar.Add("failed load event" + errorValue.Errors[0].Reason, Severity.Error);
+			}
+		}
+
+		if ((_eventDetail.IsDeleted == true) || (_eventDetail.IsRegistrationOpen == false))
+			_eventWasClosed = true;
+
+		if (!(DateTime.Now >= _eventDetail.OpenRegistrationDate && DateTime.Now <= _eventDetail.CloseRegistrationDate))
+			_eventWasClosed = true;
+
+		_loading = false;
+	}
+	#endregion
+
+	#region ticket load
+	public List<TicketCategory> _ticketCategory = new();
+	private bool _noMoreTicket = false;
+
+	public async Task LoadEventTickets()
+	{
+		_loading = true;
+
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+		var client = HttpClientFactory.CreateClient("backend");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+		using (HttpResponseMessage response = await client.GetAsync($"/api/ticket/{EventId}"))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.OK)
+			{
+				_ticketCategory = (await response.Content.ReadFromJsonAsync<List<TicketCategory>>())!;
+				if (_ticketCategory.Count == 0)
+				{
+					_noMoreTicket = true;
+					_loading = false;
+					return;
+				}
+
+				_ticketCategory = _ticketCategory
+					.Where(ticket => ticket.IsSalesOpen == true)
+					.Where(ticket => ticket.Quota > ticket.BookedQuota)
+					.Where(ticket => (DateTime.Now >= ticket.OpenSalesDate && DateTime.Now <= ticket.CloseSalesDate))
+					.ToList();
+
+				if (_ticketCategory.Count == 0)
+				{
+					_noMoreTicket = true;
+					_loading = false;
+					return;
+				}
+			}
+			else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+			{
+				_loading = false;
+				return;
+			}
+			else
+			{
+				ProblemDetails errorValue = await response.Content.ReadFromJsonAsync<ProblemDetails>() ?? new ProblemDetails();
+				Snackbar.Add("failed load ticket: " + errorValue.Errors[0].Reason, Severity.Error);
+			}
+		}
+
+		_loading = false;
+	}
+	#endregion
+
+	#region user email extrak
+	private string _userEmail = string.Empty;
+
+	public async Task SetUserEmailAsync()
+	{
+		_loading = true;
+
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+
+		JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+		JwtSecurityToken jwtToken = handler.ReadJwtToken(jwt);
+		string email = jwtToken.Claims.FirstOrDefault(cclaim => cclaim.Type == ClaimTypes.Email)?.Value!;
+		_userEmail = email;
+
+		_loading = false;
+	}
+	#endregion
+
+	#region form preview
+	public FormTemplateModel MyModel = new();
+	#endregion
+
+	#region permitted users
+	private async Task PermittedUsersAsync()
+	{
+		_loading = true;
+
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+		var client = HttpClientFactory.CreateClient("backend");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+		using (HttpResponseMessage response = await client.GetAsync($"/api/event/{EventId}/dashboard"))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+			{
+				AppNav.NavigateToPage();
+				return;
+			}
+		}
+
+		_loading = false;
+	}
+	#endregion
+
+	#region support class and record
+	public class FormTemplateModel
+	{
+		public List<DynamicField> DynamicFields { get; set; } = new List<DynamicField>();
+	}
+
+	public class TicketCategory
+	{
+		public Guid TicketId { get; set; }
+		public string Category { get; set; } = string.Empty;
+		public decimal PriceOne { get; set; }
+		public int Quota { get; set; }
+		public int BookedQuota { get; set; }
+		public bool IsSalesOpen { get; set; }
+		public DateTime OpenSalesDate { get; set; }
+		public DateTime CloseSalesDate { get; set; }
+	}
+
+	public class EventDetail
+	{
+		public Guid EventId { get; set; }
+		public Guid AcyouUserId { get; set; }
+		public string Title { get; set; } = string.Empty;
+		public string Description { get; set; } = string.Empty;
+		public string AfterBuyDescription { get; set; } = string.Empty;
+		public string FormTemplate { get; set; } = string.Empty;
+		public bool IsRegistrationOpen { get; set; }
+		public DateTime OpenRegistrationDate { get; set; }
+		public DateTime CloseRegistrationDate { get; set; }
+		public string BankAccountNumber { get; set; } = string.Empty;
+		public string BankAccountName { get; set; } = string.Empty;
+		public bool IsDeleted { get; set; }
+		public DateTime CreatedAt { get; set; }
+		public int RowVersion { get; set; }
+		public List<PosterDetail> Posters { get; set; } = [];
+	}
+
+	public class PosterDetail
+	{
+		public Guid PosterId { get; set; }
+		public string FullPathUrl { get; set; } = string.Empty;
+		public string MimeType { get; set; } = string.Empty;
+		public long ByteLength { get; set; }
+		public DateTime CreatedAt { get; set; }
+		public int RowVersion { get; set; }
+	}
+
+	public class ProblemDetails
+	{
+		public virtual int Status { get; set; }
+		public virtual string Title { get; set; } = string.Empty;
+		public virtual string Detail { get; set; } = string.Empty;
+		public virtual string Instance { get; set; } = string.Empty;
+		public virtual Uri Type { get; set; } = new Uri("about:blank");
+		public virtual string TraceId { get; set; } = string.Empty;
+		public virtual Error[] Errors { get; set; } = [];
+	}
+
+	public class Error
+	{
+		public virtual string Name { get; set; } = string.Empty;
+		public virtual string Reason { get; set; } = string.Empty;
+		public virtual string Code { get; set; } = string.Empty;
+		public virtual string Severity { get; set; } = string.Empty;
+	}
+
+	public class PaymentInfo
+	{
+		public Guid PaymentGatewayId { get; set; }
+		public List<PaymentMethod> PaymentMethods { get; set; } = [];
+	}
+
+	public class PaymentMethod
+	{
+		public Guid PaymentMethodId { get; set; }
+		public string Type { get; set; } = string.Empty;
+		public string Name { get; set; } = string.Empty;
+		public decimal FlatFee { get; set; }
+		public decimal PercentageFee { get; set; }
+		public decimal ApplicationFlatFee { get; set; }
+	}
+	#endregion
+
+	#region Authenticated User
+	private async Task<bool> IsUserAuthenticated()
+	{
+		string? refreshToken = await LocalStorageService.GetItemAsync<string>("refreshToken");
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+
+		if (string.IsNullOrEmpty(jwt) || string.IsNullOrEmpty(refreshToken))
+		{
+			return false;
+		}
+
+		if (await IsGetAuthenticateNoContentSuccessAsync(jwt))
+		{
+			SetJwtExpired(jwt);
+			return true;
+		}
+
+		string? newJwt = await PostRefreshTokenAsync(refreshToken);
+		if (newJwt is null)
+		{
+			return false;
+		}
+
+		await LocalStorageService.SetItemAsStringAsync("jwt", newJwt);
+		SetJwtExpired(newJwt);
+		return true;
+	}
+
+	private async Task ChallengeUnAuthenticatedAsync()
+	{
+		string returnUrl = Uri.EscapeDataString(Navigation.Uri);
+		AppNav.NavigateToChallenge(returnUrl);
+	}
+
+	private async Task<string?> PostRefreshTokenAsync(string refreshToken)
+	{
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		using (HttpResponseMessage response = await client.PostAsJsonAsync<RefreshTokenRequestDto>($"/api/google-login/refresh-token", new RefreshTokenRequestDto(refreshToken)))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.OK)
+				return (await response.Content.ReadFromJsonAsync<RefreshTokenResponseDto>())!.JsonWebToken;
+			else
+				return null;
+		}
+	}
+
+	private async Task<bool> IsGetAuthenticateNoContentSuccessAsync(string jwt)
+	{
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+		using (HttpResponseMessage response = await client.GetAsync($"/api/no-content/authenticated"))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+				return true;
+			else
+				return false;
+		}
+	}
+
+	public record RefreshTokenRequestDto(string RefreshToken);
+	public record RefreshTokenResponseDto(string JsonWebToken);
+	#endregion
+
+	#region Sets jwt expiration
+	private void SetJwtExpired(string jwt)
+	{
+		JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+		JwtSecurityToken jwtToken = handler.ReadJwtToken(jwt);
+		string expClaim = jwtToken.Claims.FirstOrDefault(cclaim => cclaim.Type == JwtRegisteredClaimNames.Exp)?.Value!;
+		long expSecond = long.Parse(expClaim);
+		_jwtExpiredTime = DateTimeOffset.FromUnixTimeSeconds(expSecond).UtcDateTime;
+	}
+	#endregion
+
+}
