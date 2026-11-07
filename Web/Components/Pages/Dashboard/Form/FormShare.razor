@@ -1,0 +1,622 @@
+﻿@page "/form/share"
+@layout DashboardLayout
+@inject IApplicationNavigation AppNav
+@inject ILocalStorageService LocalStorageService
+@inject IHttpClientFactory HttpClientFactory
+@inject IClipboard Clipboard
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+
+<PageTitle>form - share</PageTitle>
+
+<MudPaper Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent pt-8 pb-20">
+	<MudContainer MaxWidth="MaxWidth.Large">
+		<MudGrid Class="mt-6" Spacing="4">
+			<MudItem xs="12" md="6">
+				<MudPaper Elevation="2" Square="false" Class="pa-6">
+					<MudStack Spacing="4">
+						<MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+							<MudText Typo="Typo.subtitle1" Class="font-weight-bold">
+								<MudIcon Icon="@Icons.Material.Filled.FormatListBulleted" Class="mr-2" />
+								Form Pendaftaran
+							</MudText>
+
+							<MudChip Color="@(_isLink1Saved ? Color.Success : Color.Error)" T="string" Tint="Color.Primary" Size="Size.Small">
+								@(_isLink1Saved ? "Tersimpan" : "Tidak Tersimpan")
+							</MudChip>
+						</MudStack>
+
+						<MudTextField Value="_link1.Label"
+									  ValueChanged="(string text) => OnLableChange(_link1, text)"
+									  Placeholder="iscomfest-yy"
+									  Label="Nama tautan"
+									  Variant="Variant.Outlined"
+									  Margin="Margin.Dense"
+									  Immediate="true"
+									  For="() => _link1.Label" />
+
+						<MudTextField @bind-Value="_link1.Url"
+									  Label="URL lengkap"
+									  Placeholder="https://www.contoh.com"
+									  Variant="Variant.Outlined"
+									  Margin="Margin.Dense"
+									  Immediate="true"
+									  Disabled="true" />
+
+						<MudStack Row Spacing="2" Class="mt-2">
+							<MudButton Variant="Variant.Filled"
+									   Color="Color.Primary"
+									   StartIcon="@Icons.Material.Filled.Save"
+									   OnClick="() => SaveNewLink(_link1)">
+								Simpan perubahan
+							</MudButton>
+
+							<MudButton Variant="Variant.Outlined"
+									   Color="Color.Primary"
+									   StartIcon="@Icons.Material.Filled.OpenInNew"
+									   OnClick="() => TestLink(_link1)">
+								Uji tautan
+							</MudButton>
+						</MudStack>
+
+						<MudDivider Class="my-4" />
+
+						<MudStack Row AlignItems="AlignItems.Center" Spacing="4" Class="flex-wrap">
+							<MudPaper Elevation="1" Square="false" Class="pa-4">
+								@if (!string.IsNullOrWhiteSpace(_link1.QrImage))
+								{
+									<MudImage Src="@_link1.QrImage"
+											  Alt="QR Code Tautan Utama"
+											  Width="180"
+											  Height="180" />
+								}
+								else
+								{
+									<MudText Typo="Typo.body2" Color="Color.Inherit">
+										QR belum tersedia.
+									</MudText>
+								}
+							</MudPaper>
+
+							<MudStack Spacing="2" Class="flex-grow-1">
+								<MudText Typo="Typo.subtitle2" Class="font-weight-bold">
+									QR Code aktif
+								</MudText>
+
+								<MudText Typo="Typo.body2" Color="Color.Inherit" Style="word-break:break-all;">
+									@_link1.SavedUrl
+								</MudText>
+
+								<MudStack Row Spacing="2" Class="mt-2">
+									<MudButton Variant="Variant.Outlined"
+											   Color="Color.Primary"
+											   StartIcon="@Icons.Material.Filled.ContentCopy"
+											   OnClick="() => CopyLink(_link1)">
+										Salin URL
+									</MudButton>
+
+									<MudButton HtmlTag="a"
+											   Href="@_link1.QrImage"
+											   download="qrcode-form-pendaftaran.png"
+											   Variant="Variant.Outlined"
+											   Color="Color.Primary"
+											   StartIcon="@Icons.Material.Filled.Download">
+										Unduh QR
+									</MudButton>
+								</MudStack>
+							</MudStack>
+						</MudStack>
+					</MudStack>
+				</MudPaper>
+			</MudItem>
+
+			<MudItem xs="12" md="6">
+				<MudPaper Elevation="2" Square="false" Class="pa-6">
+					<MudStack Spacing="4">
+						<MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+							<MudText Typo="Typo.subtitle1" Class="font-weight-bold">
+								<MudIcon Icon="@Icons.Material.Filled.FindInPage" Class="mr-2" />
+								Halaman Event
+							</MudText>
+
+							<MudChip Color="@(_isLink2Saved ? Color.Success : Color.Error)" T="string" Tint="Color.Primary" Size="Size.Small">
+								@(_isLink2Saved ? "Tersimpan" : "Tidak Tersimpan")
+							</MudChip>
+						</MudStack>
+
+						<MudTextField Value="_link2.Label"
+									  ValueChanged="(string text) => OnLableChange(_link2, text)"
+									  Placeholder="iscomfest-yy"
+									  Label="Nama tautan"
+									  Variant="Variant.Outlined"
+									  Margin="Margin.Dense"
+									  Immediate="true"
+									  For="() => _link2.Label" />
+
+						<MudTextField @bind-Value="_link2.Url"
+									  Label="URL lengkap"
+									  Placeholder="https://contoh.com"
+									  Variant="Variant.Outlined"
+									  Margin="Margin.Dense"
+									  Immediate="true"
+									  Disabled="true" />
+
+						<MudStack Row Spacing="2" Class="mt-2">
+							<MudButton Variant="Variant.Filled"
+									   Color="Color.Primary"
+									   StartIcon="@Icons.Material.Filled.Save"
+									   OnClick="() => SaveNewLink(_link2)">
+								Simpan perubahan
+							</MudButton>
+
+							<MudButton Variant="Variant.Outlined"
+									   Color="Color.Primary"
+									   StartIcon="@Icons.Material.Filled.OpenInNew"
+									   OnClick="() => TestLink(_link2)">
+								Uji tautan
+							</MudButton>
+						</MudStack>
+
+						<MudDivider Class="my-4" />
+
+						<MudStack Row AlignItems="AlignItems.Center" Spacing="4" Class="flex-wrap">
+							<MudPaper Elevation="1" Square="false" Class="pa-4">
+								@if (!string.IsNullOrWhiteSpace(_link2.QrImage))
+								{
+									<MudImage Src="@_link2.QrImage"
+											  Alt="QR Code Tautan Kedua"
+											  Width="180"
+											  Height="180" />
+								}
+								else
+								{
+									<MudText Typo="Typo.body2" Color="Color.Inherit">
+										QR belum tersedia.
+									</MudText>
+								}
+							</MudPaper>
+
+							<MudStack Spacing="2" Class="flex-grow-1">
+								<MudText Typo="Typo.subtitle2" Class="font-weight-bold">
+									QR Code aktif
+								</MudText>
+
+								<MudText Typo="Typo.body2" Color="Color.Inherit" Style="word-break:break-all;">
+									@_link2.SavedUrl
+								</MudText>
+
+								<MudStack Row Spacing="2" Class="mt-2">
+									<MudButton Variant="Variant.Outlined"
+											   Color="Color.Primary"
+											   StartIcon="@Icons.Material.Filled.ContentCopy"
+											   OnClick="() => CopyLink(_link2)">
+										Salin URL
+									</MudButton>
+
+									<MudButton HtmlTag="a"
+											   Href="@_link2.QrImage"
+											   download="qrcode-halaman-event.png"
+											   Variant="Variant.Outlined"
+											   Color="Color.Primary"
+											   StartIcon="@Icons.Material.Filled.Download">
+										Unduh QR
+									</MudButton>
+								</MudStack>
+							</MudStack>
+						</MudStack>
+					</MudStack>
+				</MudPaper>
+			</MudItem>
+		</MudGrid>
+	</MudContainer>
+</MudPaper>
+
+<MudOverlay Visible="_loading" Style="height: 100dvh" DarkBackground="true" Absolute="true" ZIndex="5000">
+	<MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+</MudOverlay>
+
+@code {
+	[Parameter]
+	[SupplyParameterFromQuery(Name = "eventId")]
+	public string? EventId { get; set; }
+
+	private DateTime _jwtExpiredTime = DateTime.MinValue + TimeSpan.FromHours(1);
+	private bool _loading = false;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		if (string.IsNullOrEmpty(EventId) || string.IsNullOrWhiteSpace(EventId))
+			AppNav.NavigateToPage();
+
+		await PermittedUsersAsync();
+		await LinkSetDefault();
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			if (!await IsUserAuthenticated())
+			{
+				await ChallengeUnAuthenticatedAsync();
+				return;
+			}
+		}
+
+		if ((_jwtExpiredTime - TimeSpan.FromMinutes(1)) < DateTime.UtcNow)
+		{
+			if (!await IsUserAuthenticated())
+			{
+				await ChallengeUnAuthenticatedAsync();
+				return;
+			}
+		}
+	}
+
+	#region save change link
+	private bool _isLink1Saved = true;
+	private bool _isLink2Saved = true;
+
+	private async Task SaveNewLink(LinkModel link)
+	{
+		_loading = true;
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+		var client = HttpClientFactory.CreateClient("backend");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+		if (link == _link1)
+		{
+			CustomUrl customUrl = _customUrls.Where(listCustomUrl => listCustomUrl.EventId == Guid.Parse(EventId!)).First();
+			customUrl.FormCustomUrl = _link1.Label;
+			using (HttpResponseMessage response = await client.PutAsJsonAsync<CustomUrl>($"/api/custom-url", customUrl))
+			{
+				if (response.StatusCode != System.Net.HttpStatusCode.OK)
+				{
+					ProblemDetails? problemDetails = (await response.Content.ReadFromJsonAsync<ProblemDetails>())!;
+					Snackbar.Add($"[{problemDetails.Detail}] {problemDetails.Errors[0].Reason}", Severity.Error, option =>
+					{
+						option.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow;
+					});
+					
+					await LinkSetDefault();
+					return;
+				}
+			}
+			_isLink1Saved = true;
+		}
+
+		if (link == _link2)
+		{
+			CustomUrl customUrl = _customUrls.Where(listCustomUrl => listCustomUrl.EventId == Guid.Parse(EventId!)).First();
+			customUrl.PageCustomUrl = _link2.Label;
+			using (HttpResponseMessage response = await client.PutAsJsonAsync<CustomUrl>($"/api/custom-url", customUrl))
+			{
+				if (response.StatusCode != System.Net.HttpStatusCode.OK)
+				{
+					ProblemDetails? problemDetails = (await response.Content.ReadFromJsonAsync<ProblemDetails>())!;
+					Snackbar.Add($"[{problemDetails.Detail}] {problemDetails.Errors[0].Reason}", Severity.Error, option =>
+					{
+						option.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow;
+					});
+
+					await LinkSetDefault();
+					return;
+				}
+
+				CustomUrl? customUrlResponse = (await response.Content.ReadFromJsonAsync<CustomUrl>())!;
+				customUrl.PageCustomUrl = customUrlResponse.PageCustomUrl;
+			}
+			_isLink2Saved = true;
+		}
+
+		_loading = false;
+	}
+	#endregion
+
+	#region perplexity logic
+	private string _link1ErrorText = "nama tautan sudah digunakan";
+	private string _link2ErrorText = "nama tautan sudah digunakan";
+	private List<CustomUrl> _customUrls = [];
+
+	private LinkModel _link1 = new()
+	{
+		Label = "website-resmi",
+		Url = "",
+		SavedUrl = "",
+		BaseUrl = ""
+	};
+
+	private LinkModel _link2 = new()
+	{
+		Label = "website-resmi",
+		Url = "",
+		SavedUrl = "",
+		BaseUrl = ""
+	};
+
+	private async Task LinkSetDefault()
+	{
+		_loading = true;
+
+		_link1.BaseUrl = new Uri(Navigation.BaseUri).Authority + "/e/";
+		_link2.BaseUrl = new Uri(Navigation.BaseUri).Authority + "/p/";
+
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+		var client = HttpClientFactory.CreateClient("backend");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+		using (HttpResponseMessage response = await client.GetAsync($"/api/custom-url"))
+		{
+			if (response.StatusCode != System.Net.HttpStatusCode.OK)
+			{
+				ProblemDetails? problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+				Snackbar.Add($"[{problemDetails!.Title}] {problemDetails.Detail}", Severity.Error);
+				_loading = false;
+				return;
+			}
+
+			_customUrls = await response.Content.ReadFromJsonAsync<List<CustomUrl>>() ?? [];
+			CustomUrl customUrl = _customUrls.Where(listCustomUrl => listCustomUrl.EventId == Guid.Parse(EventId!)).First();
+
+			await OnLableChange(_link1, customUrl.FormCustomUrl);
+			await OnLableChange(_link2, customUrl.PageCustomUrl);
+		}
+
+		_isLink1Saved = true;
+		_isLink2Saved = true;
+
+		_loading = false;
+	}
+
+	private async Task OnLableChange(LinkModel link, string newLabel)
+	{
+		if (string.IsNullOrEmpty(newLabel) || string.IsNullOrWhiteSpace(newLabel))
+			return;
+
+		if (!Regex.IsMatch(newLabel, @"^[a-z0-9_-]+$"))
+			return;
+
+		if (link == _link1)
+		{
+			bool link1Duplicate = _customUrls.Any(listCustomUrl => listCustomUrl.FormCustomUrl == newLabel && listCustomUrl.EventId != Guid.Parse(EventId!));
+			if (link1Duplicate)
+			{
+				Snackbar.Add(_link1ErrorText, Severity.Error, option =>
+				{
+					option.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow;
+				});
+				return;
+			}
+
+			_isLink1Saved = false;
+		}
+
+		if (link == _link2)
+		{
+			bool link2Duplicate = _customUrls.Any(listCustomUrl => listCustomUrl.PageCustomUrl == newLabel && listCustomUrl.EventId != Guid.Parse(EventId!));
+			if (link2Duplicate)
+			{
+				Snackbar.Add(_link2ErrorText, Severity.Error, option =>
+				{
+					option.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow;
+				});
+				return;
+			}
+
+			_isLink2Saved = false;
+		}
+
+		link.Label = newLabel;
+		link.Url = link.BaseUrl + newLabel;
+		await SaveLink(link);
+	}
+
+	private async Task SaveLink(LinkModel link)
+	{
+		var url = link.Url?.Trim();
+
+		if (string.IsNullOrWhiteSpace(url) || !IsValidUrl(url))
+		{
+			link.ValidationMessage = "Masukkan URL lengkap yang valid, contoh: https://contoh.com";
+			link.IsValid = false;
+			return;
+		}
+
+		link.Url = url;
+		link.SavedUrl = url;
+		link.IsValid = true;
+		link.ValidationMessage = "URL valid.";
+		link.QrImage = GenerateQrImage(url);
+
+		await Task.CompletedTask;
+	}
+
+	private void TestLink(LinkModel link)
+	{
+		var url = link.Url?.Trim();
+
+		if (string.IsNullOrWhiteSpace(url) || !IsValidUrl(url))
+		{
+			link.ValidationMessage = "URL belum valid.";
+			link.IsValid = false;
+			return;
+		}
+
+		Navigation.NavigateTo("https://" + url, true);
+	}
+
+	private async Task CopyLink(LinkModel link)
+	{
+		var url = link.Url?.Trim();
+
+		if (string.IsNullOrWhiteSpace(url))
+		{
+			return;
+		}
+
+		await Clipboard.SetTextAsync(url);
+		Snackbar.Add("url berhasil disalin", Severity.Success, option =>
+		{
+			option.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow;
+		});
+	}
+
+	private static bool IsValidUrl(string url)
+	{
+		url = "https://" + url;
+		return Uri.TryCreate(url, UriKind.Absolute, out var uri)
+			&& (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
+	}
+
+	private static string GenerateQrImage(string value)
+	{
+		var urlPayload = new PayloadGenerator.Url(value);
+
+		using var generator = QRCodeGenerator.GenerateQrCode(urlPayload, QRCodeGenerator.ECCLevel.H);
+		using var qrCode = new PngByteQRCode(generator);
+		var pngBytes = qrCode.GetGraphic(10);
+
+		return $"data:image/png;base64,{Convert.ToBase64String(pngBytes)}";
+	}
+	#endregion
+
+	#region permitted users
+	private async Task PermittedUsersAsync()
+	{
+		_loading = true;
+
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+		var client = HttpClientFactory.CreateClient("backend");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+		using (HttpResponseMessage response = await client.GetAsync($"/api/event/{EventId}/dashboard"))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+			{
+				AppNav.NavigateToPage();
+				return;
+			}
+		}
+
+		_loading = false;
+	}
+	#endregion
+
+	#region support class and record
+	private class LinkModel
+	{
+		[Required(ErrorMessage = "tidak boleh kosong.")]
+		[RegularExpression(@"^[a-z0-9_-]+$", ErrorMessage = "Hanya boleh huruf kecil az, angka 09, tanda hubung -, dan garis bawah _")]
+		public string Label { get; set; } = string.Empty;
+		public string Url { get; set; } = string.Empty;
+		public string SavedUrl { get; set; } = string.Empty;
+		public string BaseUrl { get; set; } = string.Empty;
+		public string QrImage { get; set; } = string.Empty;
+		public bool IsValid { get; set; } = true;
+		public string ValidationMessage { get; set; } = string.Empty;
+	}
+
+	public class ProblemDetails
+	{
+		public int Status { get; set; }
+		public string Title { get; set; } = string.Empty;
+		public string Detail { get; set; } = string.Empty;
+		public string Instance { get; set; } = string.Empty;
+		public Uri Type { get; set; } = new Uri("about:blank");
+		public string TraceId { get; set; } = string.Empty;
+		public Error[] Errors { get; set; } = [];
+	}
+
+	public class Error
+	{
+		public string Name { get; set; } = string.Empty;
+		public string Reason { get; set; } = string.Empty;
+		public string Code { get; set; } = string.Empty;
+		public string Severity { get; set; } = string.Empty;
+	}
+
+	public class CustomUrl
+	{
+		public Guid EventId { get; set; }
+		public string FormCustomUrl { get; set; } = string.Empty;
+		public string PageCustomUrl { get; set; } = string.Empty;
+	}
+	#endregion
+
+	#region Authenticated User
+	private async Task<bool> IsUserAuthenticated()
+	{
+		string? refreshToken = await LocalStorageService.GetItemAsync<string>("refreshToken");
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+
+		if (string.IsNullOrEmpty(jwt) || string.IsNullOrEmpty(refreshToken))
+		{
+			return false;
+		}
+
+		if (await IsGetAuthenticateNoContentSuccessAsync(jwt))
+		{
+			SetJwtExpired(jwt);
+			return true;
+		}
+
+		string? newJwt = await PostRefreshTokenAsync(refreshToken);
+		if (newJwt is null)
+		{
+			return false;
+		}
+
+		await LocalStorageService.SetItemAsStringAsync("jwt", newJwt);
+		SetJwtExpired(newJwt);
+		return true;
+	}
+
+	private async Task ChallengeUnAuthenticatedAsync()
+	{
+		string returnUrl = Uri.EscapeDataString(Navigation.Uri);
+		AppNav.NavigateToChallenge(returnUrl);
+	}
+
+	private async Task<string?> PostRefreshTokenAsync(string refreshToken)
+	{
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		using (HttpResponseMessage response = await client.PostAsJsonAsync<RefreshTokenRequestDto>($"/api/google-login/refresh-token", new RefreshTokenRequestDto(refreshToken)))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.OK)
+				return (await response.Content.ReadFromJsonAsync<RefreshTokenResponseDto>())!.JsonWebToken;
+			else
+				return null;
+		}
+	}
+
+	private async Task<bool> IsGetAuthenticateNoContentSuccessAsync(string jwt)
+	{
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+		using (HttpResponseMessage response = await client.GetAsync($"/api/no-content/authenticated"))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+				return true;
+			else
+				return false;
+		}
+	}
+
+	public record RefreshTokenRequestDto(string RefreshToken);
+	public record RefreshTokenResponseDto(string JsonWebToken);
+	#endregion
+
+	#region Sets jwt expiration
+	private void SetJwtExpired(string jwt)
+	{
+		JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+		JwtSecurityToken jwtToken = handler.ReadJwtToken(jwt);
+		string expClaim = jwtToken.Claims.FirstOrDefault(cclaim => cclaim.Type == JwtRegisteredClaimNames.Exp)?.Value!;
+		long expSecond = long.Parse(expClaim);
+		_jwtExpiredTime = DateTimeOffset.FromUnixTimeSeconds(expSecond).UtcDateTime;
+	}
+	#endregion
+
+}

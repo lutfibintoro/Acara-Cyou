@@ -2,7 +2,9 @@ using Blazored.LocalStorage;
 using Formaze.Blazor.Mudblazor.Tools;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using MudBlazor;
 using MudBlazor.Services;
+using TextCopy;
 using Web.Components;
 using Web.Services;
 using Web.Services.Interface;
@@ -18,6 +20,7 @@ namespace Web
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
             builder.Services.AddFormaze<MyFormazeStore>();
+            builder.Services.InjectClipboard();
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddMudServices();
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
