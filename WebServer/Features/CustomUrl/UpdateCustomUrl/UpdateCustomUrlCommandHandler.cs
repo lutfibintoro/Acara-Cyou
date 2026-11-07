@@ -3,7 +3,6 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using WebServer.Infrastructures.Data;
-using WebServer.Infrastructures.Data.Entities;
 using WebServer.Infrastructures.ResultError;
 
 namespace WebServer.Features.CustomUrl.UpdateCustomUrl
@@ -74,7 +73,12 @@ namespace WebServer.Features.CustomUrl.UpdateCustomUrl
                 try
                 {
                     await _dbContext.SaveChangesAsync(cancellationToken);
-                    return Result.Ok();
+                    return Result.Ok(new UpdateCustomUrlResponse()
+                    {
+                        EventId = myEnvet.Id,
+                        FormCustomUrl = myEnvet.FormCustomUrl,
+                        PageCustomUrl = myEnvet.PageCustomUrl
+                    });
                 }
                 catch (DbUpdateConcurrencyException)
                 {

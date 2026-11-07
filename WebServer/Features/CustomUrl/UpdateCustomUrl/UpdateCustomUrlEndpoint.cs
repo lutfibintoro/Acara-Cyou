@@ -7,7 +7,6 @@ using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.WebUtilities;
-using WebServer.Features.CustomUrl.GetCustomUrl;
 
 namespace WebServer.Features.CustomUrl.UpdateCustomUrl
 {
