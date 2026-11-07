@@ -10,6 +10,7 @@ namespace WebServer.Infrastructures.Data.Entities
         public string AfterBuyDescription { get; set; } = string.Empty;
         public string FormTemplate { get; set; } = string.Empty;
         public string FormCustomUrl { get; set; } = Guid.NewGuid().ToString();
+        public string PageCustomUrl { get; set; } = Guid.NewGuid().ToString();
         public bool IsRegistrationOpen { get; set; } = false;
         public DateTime OpenRegistrationDate { get; set; } = DateTime.UtcNow;
         public DateTime CloseRegistrationDate { get; set; } = DateTime.UtcNow + TimeSpan.FromMinutes(1);

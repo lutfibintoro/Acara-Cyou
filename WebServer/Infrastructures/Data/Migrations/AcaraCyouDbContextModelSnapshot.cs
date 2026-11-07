@@ -1143,6 +1143,11 @@ namespace WebServer.Infrastructures.Data.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("open_registration_date");
 
+                    b.Property<string>("PageCustomUrl")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("page_custom_url");
+
                     b.Property<int>("RowVersion")
                         .IsConcurrencyToken()
                         .HasColumnType("int")
@@ -1162,6 +1167,10 @@ namespace WebServer.Infrastructures.Data.Migrations
                     b.HasIndex("FormCustomUrl")
                         .IsUnique()
                         .HasDatabaseName("ix_event_form_custom_url");
+
+                    b.HasIndex("PageCustomUrl")
+                        .IsUnique()
+                        .HasDatabaseName("ix_event_page_custom_url");
 
                     b.ToTable("event", (string)null);
                 });

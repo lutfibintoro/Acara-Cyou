@@ -132,6 +132,9 @@ namespace WebServer.Infrastructures.Data
 
                 buildAction.HasIndex(e => e.FormCustomUrl)
                       .IsUnique();
+
+                buildAction.HasIndex(e => e.PageCustomUrl)
+                      .IsUnique();
             });
 
             builder.Entity<DisbursementDetail>(buildAction =>
