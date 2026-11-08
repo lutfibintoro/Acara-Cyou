@@ -18,10 +18,12 @@ namespace WebServer.Features.CustomUrl.UpdateCustomUrl
                     .NotNull();
 
                 RuleFor(request => request.Body.FormCustomUrl)
-                    .NotNull();
+                    .NotNull()
+                    .Matches(@"^[a-z0-9-_]+$");
 
                 RuleFor(request => request.Body.PageCustomUrl)
-                    .NotNull();
+                    .NotNull()
+                    .Matches(@"^[a-z0-9-_]+$");
             });
         }
     }
