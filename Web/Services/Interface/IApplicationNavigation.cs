@@ -2,6 +2,7 @@
 {
     public interface IApplicationNavigation
     {
+        public void NavigateToNotFound();
         public void NavigateToUrl(string url);
         public void NavigateToFitur();
         public void NavigateToMasalah();

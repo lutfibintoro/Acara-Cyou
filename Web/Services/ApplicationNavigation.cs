@@ -12,6 +12,7 @@ namespace Web.Services
             _navigation = navigation;
         }
 
+        public void NavigateToNotFound() => _navigation.NavigateTo("/not-found");
         public void NavigateToUrl(string url) => _navigation.NavigateTo(url);
         public void NavigateToFitur() => _navigation.NavigateTo("https://acara.cyou/#fitur");
         public void NavigateToMasalah() => _navigation.NavigateTo("https://acara.cyou/#masalah");
