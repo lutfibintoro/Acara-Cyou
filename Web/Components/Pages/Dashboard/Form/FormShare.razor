@@ -304,9 +304,6 @@
 					await LinkSetDefault();
 					return;
 				}
-
-				CustomUrl? customUrlResponse = (await response.Content.ReadFromJsonAsync<CustomUrl>())!;
-				customUrl.PageCustomUrl = customUrlResponse.PageCustomUrl;
 			}
 			_isLink2Saved = true;
 		}

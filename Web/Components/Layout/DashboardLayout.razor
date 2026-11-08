@@ -296,6 +296,7 @@
 	{
 		if (await UserIsNotAuthenticateAsync())
 		{
+			await LocalStorageService.RemoveItemsAsync(["jwt", "refreshToken", "profileImageUrl"]);
 			AppNav.NavigateToPage();
 			return;
 		}
