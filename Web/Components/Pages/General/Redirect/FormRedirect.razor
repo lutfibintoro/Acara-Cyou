@@ -1,0 +1,151 @@
+﻿@page "/e/{CustomUrlName}"
+@inject IApplicationNavigation AppNav
+@inject ILocalStorageService LocalStorageService
+@inject IHttpClientFactory HttpClientFactory
+@inject IClipboard Clipboard
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+
+<PageTitle>form - redirect</PageTitle>
+
+<MudPaper Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent pt-8 pb-20">
+	<MudContainer MaxWidth="MaxWidth.Small">
+		<MudText Typo="Typo.h6">@CustomUrlName</MudText>
+	</MudContainer>
+</MudPaper>
+
+<MudOverlay Visible="_loading" Style="height: 100dvh" DarkBackground="true" Absolute="true" ZIndex="5000">
+	<MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+</MudOverlay>
+
+@code {
+	[Parameter]
+	public string CustomUrlName { get; set; } = string.Empty;
+
+	private DateTime _jwtExpiredTime = DateTime.MinValue + TimeSpan.FromHours(1);
+	private bool _loading = false;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		if (string.IsNullOrEmpty(CustomUrlName) || string.IsNullOrWhiteSpace(CustomUrlName))
+			AppNav.NavigateToPage();
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			if (!await IsUserAuthenticated())
+			{
+				await ChallengeUnAuthenticatedAsync();
+				return;
+			}
+		}
+
+		if ((_jwtExpiredTime - TimeSpan.FromMinutes(1)) < DateTime.UtcNow)
+		{
+			if (!await IsUserAuthenticated())
+			{
+				await ChallengeUnAuthenticatedAsync();
+				return;
+			}
+		}
+	}
+
+	#region support class and record
+	public class ProblemDetails
+	{
+		public int Status { get; set; }
+		public string Title { get; set; } = string.Empty;
+		public string Detail { get; set; } = string.Empty;
+		public string Instance { get; set; } = string.Empty;
+		public Uri Type { get; set; } = new Uri("about:blank");
+		public string TraceId { get; set; } = string.Empty;
+		public Error[] Errors { get; set; } = [];
+	}
+
+	public class Error
+	{
+		public string Name { get; set; } = string.Empty;
+		public string Reason { get; set; } = string.Empty;
+		public string Code { get; set; } = string.Empty;
+		public string Severity { get; set; } = string.Empty;
+	}
+	#endregion
+
+	#region Authenticated User
+	private async Task<bool> IsUserAuthenticated()
+	{
+		string? refreshToken = await LocalStorageService.GetItemAsync<string>("refreshToken");
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+
+		if (string.IsNullOrEmpty(jwt) || string.IsNullOrEmpty(refreshToken))
+		{
+			return false;
+		}
+
+		if (await IsGetAuthenticateNoContentSuccessAsync(jwt))
+		{
+			SetJwtExpired(jwt);
+			return true;
+		}
+
+		string? newJwt = await PostRefreshTokenAsync(refreshToken);
+		if (newJwt is null)
+		{
+			return false;
+		}
+
+		await LocalStorageService.SetItemAsStringAsync("jwt", newJwt);
+		SetJwtExpired(newJwt);
+		return true;
+	}
+
+	private async Task ChallengeUnAuthenticatedAsync()
+	{
+		string returnUrl = Uri.EscapeDataString(Navigation.Uri);
+		AppNav.NavigateToChallenge(returnUrl);
+	}
+
+	private async Task<string?> PostRefreshTokenAsync(string refreshToken)
+	{
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		using (HttpResponseMessage response = await client.PostAsJsonAsync<RefreshTokenRequestDto>($"/api/google-login/refresh-token", new RefreshTokenRequestDto(refreshToken)))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.OK)
+				return (await response.Content.ReadFromJsonAsync<RefreshTokenResponseDto>())!.JsonWebToken;
+			else
+				return null;
+		}
+	}
+
+	private async Task<bool> IsGetAuthenticateNoContentSuccessAsync(string jwt)
+	{
+		HttpClient client = HttpClientFactory.CreateClient("backend");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+		using (HttpResponseMessage response = await client.GetAsync($"/api/no-content/authenticated"))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+				return true;
+			else
+				return false;
+		}
+	}
+
+	public record RefreshTokenRequestDto(string RefreshToken);
+	public record RefreshTokenResponseDto(string JsonWebToken);
+	#endregion
+
+	#region Sets jwt expiration
+	private void SetJwtExpired(string jwt)
+	{
+		JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+		JwtSecurityToken jwtToken = handler.ReadJwtToken(jwt);
+		string expClaim = jwtToken.Claims.FirstOrDefault(cclaim => cclaim.Type == JwtRegisteredClaimNames.Exp)?.Value!;
+		long expSecond = long.Parse(expClaim);
+		_jwtExpiredTime = DateTimeOffset.FromUnixTimeSeconds(expSecond).UtcDateTime;
+	}
+	#endregion
+}
