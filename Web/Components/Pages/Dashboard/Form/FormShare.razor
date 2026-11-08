@@ -279,7 +279,7 @@
 					{
 						option.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow;
 					});
-					
+
 					await LinkSetDefault();
 					return;
 				}
@@ -444,7 +444,7 @@
 			return;
 		}
 
-		Navigation.NavigateTo("https://" + url, true);
+		AppNav.NavigateToUrl("https://" + url);
 	}
 
 	private async Task CopyLink(LinkModel link)
