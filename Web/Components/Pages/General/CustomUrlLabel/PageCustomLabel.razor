@@ -8,9 +8,139 @@
 
 <PageTitle>page - redirect</PageTitle>
 
-<MudPaper Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent pt-8 pb-20">
-	<MudContainer MaxWidth="MaxWidth.Small">
-		<MudText Typo="Typo.h6">@CustomUrlName</MudText>
+<MudPaper Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent py-15">
+	<MudContainer MaxWidth="MaxWidth.Large">
+		<MudGrid Spacing="15" Justify="Justify.Center">
+			<MudItem xs="12" md="6">
+				@if (HasPoster)
+				{
+					<MudCarousel TData="EventPoster"
+								 ItemsSource="@Event!.Posters"
+								 Style="height: 420px"
+								 AutoCycle="true"
+								 AutoCycleTime="TimeSpan.FromSeconds(5)"
+								 ShowArrows="true"
+								 ShowBullets="true"
+								 EnableSwipeGesture="true"
+								 Class="rounded-lg">
+						<ItemTemplate Context="poster">
+							<MudStack Row="false" Reverse="false" Spacing="0" Justify="Justify.Center" AlignItems="AlignItems.Center" Style="height: 100%">
+								<MudImage Src="@poster.FullPathUrl"
+										  Alt="@Event?.Title"
+										  ObjectFit="ObjectFit.Contain"
+										  ObjectPosition="ObjectPosition.Center"
+										  Width="null"
+										  Height="420"
+										  Elevation="0" />
+							</MudStack>
+						</ItemTemplate>
+					</MudCarousel>
+				}
+				else
+				{
+					<MudPaper Square="true" Outlined="true" Elevation="0" Class="pa-8">
+						<MudStack AlignItems="AlignItems.Center" Spacing="2">
+							<MudIcon Icon="@Icons.Material.Filled.Image" Size="Size.Large" />
+							<MudText Typo="Typo.body2">Poster event belum tersedia</MudText>
+						</MudStack>
+					</MudPaper>
+				}
+			</MudItem>
+
+			<MudItem xs="12" md="6">
+				<MudText Typo="Typo.h3" Class="mb-2">
+					@Event?.Title
+				</MudText>
+
+				<MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center" Class="mb-4">
+					<MudChip T="string"
+							 Size="Size.Small"
+							 Variant="Variant.Filled"
+							 Color="@GetRegistrationStatusColor()">
+						@GetRegistrationStatusText()
+					</MudChip>
+
+					<MudText Typo="Typo.body2">
+						@FormatDate(Event?.OpenRegistrationDate) – @FormatDate(Event?.CloseRegistrationDate)
+					</MudText>
+				</MudStack>
+
+				<MudText Typo="Typo.body1" Class="mb-4">
+					@((MarkupString)(Event?.Description ?? ""))
+				</MudText>
+
+				<MudButton Variant="Variant.Filled"
+						   Color="Color.Primary"
+						   Size="Size.Large"
+						   Disabled="@(!IsRegistrationOpen)"
+						   Href="@GetRegistrationUrl()">
+					Daftar Sekarang
+				</MudButton>
+			</MudItem>
+		</MudGrid>
+	</MudContainer>
+</MudPaper>
+
+<MudPaper Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent pb-15">
+	<MudContainer MaxWidth="MaxWidth.Large">
+		<MudText Typo="Typo.h4" Class="mb-2">Tiket</MudText>
+		<MudText Typo="Typo.body2" Class="mb-6">
+			Pilih kategori tiket sesuai kebutuhan Anda.
+		</MudText>
+
+		<MudGrid Spacing="4">
+			@foreach (var ticket in Tickets)
+			{
+				<MudItem xs="12" sm="6" md="4">
+					<MudCard Outlined="true" Square="true" Elevation="0">
+						<MudCardHeader>
+							<CardHeaderContent>
+								<MudText Typo="Typo.h6">@ticket.Category</MudText>
+							</CardHeaderContent>
+
+							<CardHeaderActions>
+								<MudChip T="string"
+										 Size="Size.Small"
+										 Variant="Variant.Filled"
+										 Color="@GetTicketStatusColor(ticket)">
+									@GetTicketStatusText(ticket)
+								</MudChip>
+							</CardHeaderActions>
+						</MudCardHeader>
+
+						<MudCardContent>
+							<MudText Typo="Typo.h5" Class="mb-2">
+								@FormatPrice(ticket.PriceOne)
+							</MudText>
+
+							<MudStack Spacing="1" Class="mb-3">
+								<MudText Typo="Typo.body2">
+									Kuota: @ticket.BookedQuota / @ticket.Quota
+								</MudText>
+
+								<MudProgressLinear Value="@GetTicketQuotaPercentage(ticket)"
+												   Color="@GetTicketProgressColor(ticket)"
+												   Rounded="true" />
+							</MudStack>
+
+							<MudText Typo="Typo.caption">
+								Penjualan: @FormatDate(ticket.OpenSalesDate) – @FormatDate(ticket.CloseSalesDate)
+							</MudText>
+						</MudCardContent>
+
+						<MudCardActions>
+							<MudButton Variant="Variant.Filled"
+									   Color="Color.Primary"
+									   FullWidth="true"
+									   Disabled="@(!IsTicketAvailable(ticket))"
+									   Href="@GetRegistrationUrl()">
+								@GetTicketButtonText(ticket)
+							</MudButton>
+						</MudCardActions>
+					</MudCard>
+				</MudItem>
+			}
+		</MudGrid>
 	</MudContainer>
 </MudPaper>
 
@@ -31,6 +161,9 @@
 
 		if (string.IsNullOrEmpty(CustomUrlName) || string.IsNullOrWhiteSpace(CustomUrlName))
 			AppNav.NavigateToPage();
+
+		await LoadEvent();
+		await TicketLoad();
 	}
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -54,6 +187,252 @@
 		}
 	}
 
+	#region load event
+	public async Task LoadEvent()
+	{
+		_loading = true;
+
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+		var client = HttpClientFactory.CreateClient("backend");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+		using (HttpResponseMessage response = await client.GetAsync($"/api/event/page?customUrlName={CustomUrlName}"))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+			{
+				AppNav.NavigateToNotFound();
+				return;
+			}
+			else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+			{
+				ProblemDetails? problemDetails = (await response.Content.ReadFromJsonAsync<ProblemDetails>())!;
+				Snackbar.Add($"[{problemDetails.Title}] {problemDetails.Errors[0].Reason}", Severity.Error, option =>
+				{
+					option.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow;
+				});
+				return;
+			}
+
+			Event = (await response.Content.ReadFromJsonAsync<EventPage>())!;
+		}
+
+		_loading = false;
+	}
+	#endregion
+
+	#region load ticket
+	public async Task TicketLoad()
+	{
+		_loading = true;
+
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+		var client = HttpClientFactory.CreateClient("backend");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+		using (HttpResponseMessage response = await client.GetAsync($"/api/ticket/{Event!.EventId}"))
+		{
+			if (response.StatusCode != System.Net.HttpStatusCode.OK)
+			{
+				Tickets = [];
+				return;
+			}
+			Tickets = (await response.Content.ReadFromJsonAsync<List<EventTicket>>())!;
+		}
+
+		_loading = false;
+	}
+	#endregion
+
+	#region perplexity logic
+	private EventPage? Event { get; set; }
+	private List<EventTicket> Tickets { get; set; } = new();
+	private bool HasPoster => Event?.Posters?.Any() == true;
+	private bool HasPosters => Event?.Posters?.Count > 1;
+	private bool IsRegistrationOpen =>
+		Event is not null &&
+		Event.IsRegistrationOpen &&
+		DateTime.Now >= Event.OpenRegistrationDate &&
+		DateTime.Now <= Event.CloseRegistrationDate;
+
+	private string GetShortDescription()
+	{
+		if (string.IsNullOrWhiteSpace(Event?.Description))
+		{
+			return string.Empty;
+		}
+
+		var description = Event.Description.Trim();
+
+		return description.Length <= 180
+			? description
+			: string.Concat(description.AsSpan(0, 177), "...");
+	}
+
+	private string GetRegistrationUrl()
+	{
+		if (Event is null)
+		{
+			return "#";
+		}
+
+		return $"/e/{Event.FormCustomUrl}";
+	}
+
+	private string GetRegistrationStatusText()
+	{
+		if (Event is null)
+		{
+			return "Memuat...";
+		}
+
+		if (DateTime.Now < Event.OpenRegistrationDate)
+		{
+			return "Pendaftaran Belum Dibuka";
+		}
+
+		if (DateTime.Now > Event.CloseRegistrationDate || !Event.IsRegistrationOpen)
+		{
+			return "Pendaftaran Ditutup";
+		}
+
+		return "Pendaftaran Dibuka";
+	}
+
+	private Color GetRegistrationStatusColor()
+	{
+		if (Event is null)
+		{
+			return Color.Default;
+		}
+
+		if (DateTime.Now < Event.OpenRegistrationDate)
+		{
+			return Color.Info;
+		}
+
+		if (DateTime.Now > Event.CloseRegistrationDate || !Event.IsRegistrationOpen)
+		{
+			return Color.Error;
+		}
+
+		return Color.Success;
+	}
+
+	private bool IsTicketAvailable(EventTicket ticket)
+	{
+		return IsRegistrationOpen &&
+			   ticket.IsSalesOpen &&
+			   DateTime.Now >= ticket.OpenSalesDate &&
+			   DateTime.Now <= ticket.CloseSalesDate &&
+			   ticket.BookedQuota < ticket.Quota;
+	}
+
+	private string GetTicketStatusText(EventTicket ticket)
+	{
+		if (ticket.BookedQuota >= ticket.Quota)
+		{
+			return "Sold Out";
+		}
+
+		if (DateTime.Now < ticket.OpenSalesDate)
+		{
+			return "Belum Dibuka";
+		}
+
+		if (DateTime.Now > ticket.CloseSalesDate || !ticket.IsSalesOpen)
+		{
+			return "Ditutup";
+		}
+
+		var remaining = ticket.Quota - ticket.BookedQuota;
+
+		return remaining <= 10
+			? $"Sisa {remaining} Tiket"
+			: "Tersedia";
+	}
+
+	private Color GetTicketStatusColor(EventTicket ticket)
+	{
+		if (ticket.BookedQuota >= ticket.Quota)
+		{
+			return Color.Error;
+		}
+
+		if (DateTime.Now < ticket.OpenSalesDate)
+		{
+			return Color.Info;
+		}
+
+		if (DateTime.Now > ticket.CloseSalesDate || !ticket.IsSalesOpen)
+		{
+			return Color.Error;
+		}
+
+		return Color.Success;
+	}
+
+	private double GetTicketQuotaPercentage(EventTicket ticket)
+	{
+		if (ticket.Quota <= 0)
+		{
+			return 0;
+		}
+
+		return Math.Min(100, (double)ticket.BookedQuota / ticket.Quota * 100);
+	}
+
+	private Color GetTicketProgressColor(EventTicket ticket)
+	{
+		var percentage = GetTicketQuotaPercentage(ticket);
+
+		return percentage switch
+		{
+			>= 90 => Color.Error,
+			>= 70 => Color.Warning,
+			_ => Color.Primary
+		};
+	}
+
+	private string GetTicketButtonText(EventTicket ticket)
+	{
+		if (ticket.BookedQuota >= ticket.Quota)
+		{
+			return "Sold Out";
+		}
+
+		if (DateTime.Now < ticket.OpenSalesDate)
+		{
+			return "Belum Dibuka";
+		}
+
+		if (DateTime.Now > ticket.CloseSalesDate || !ticket.IsSalesOpen)
+		{
+			return "Ditutup";
+		}
+
+		return "Pilih Tiket";
+	}
+
+	private string FormatDate(DateTime? value)
+	{
+		if (value is null)
+		{
+			return "-";
+		}
+
+		return value.Value
+			.ToLocalTime()
+			.ToString("dd MMM yyyy", CultureInfo.GetCultureInfo("id-ID"));
+	}
+
+	private string FormatPrice(decimal price)
+	{
+		return price == 0
+			? "Gratis"
+			: price.ToString("C0", CultureInfo.GetCultureInfo("id-ID"));
+	}
+	#endregion
+
 	#region support class and record
 	public class ProblemDetails
 	{
@@ -72,6 +451,44 @@
 		public string Reason { get; set; } = string.Empty;
 		public string Code { get; set; } = string.Empty;
 		public string Severity { get; set; } = string.Empty;
+	}
+
+	public class EventPage
+	{
+		public Guid EventId { get; set; }
+		public string Title { get; set; } = string.Empty;
+		public string Description { get; set; } = string.Empty;
+		public string AfterBuyDescription { get; set; } = string.Empty;
+		public string FormTemplate { get; set; } = string.Empty;
+		public string FormCustomUrl { get; set; } = Guid.NewGuid().ToString();
+		public string PageCustomUrl { get; set; } = Guid.NewGuid().ToString();
+		public bool IsRegistrationOpen { get; set; } = false;
+		public DateTime OpenRegistrationDate { get; set; } = DateTime.UtcNow;
+		public DateTime CloseRegistrationDate { get; set; } = DateTime.UtcNow + TimeSpan.FromMinutes(1);
+		public string BankAccountNumber { get; set; } = string.Empty;
+		public string BankAccountName { get; set; } = string.Empty;
+		public bool IsDeleted { get; set; } = false;
+		public List<EventPoster> Posters { get; set; } = new();
+	}
+
+	public class EventPoster
+	{
+		public Guid PosterId { get; set; }
+		public string FullPathUrl { get; set; } = string.Empty;
+		public string MimeType { get; set; } = string.Empty;
+		public long ByteLength { get; set; }
+	}
+
+	public class EventTicket
+	{
+		public Guid TicketId { get; set; }
+		public string Category { get; set; } = string.Empty;
+		public decimal PriceOne { get; set; }
+		public int Quota { get; set; }
+		public int BookedQuota { get; set; }
+		public bool IsSalesOpen { get; set; }
+		public DateTime OpenSalesDate { get; set; }
+		public DateTime CloseSalesDate { get; set; }
 	}
 	#endregion
 
@@ -148,4 +565,5 @@
 		_jwtExpiredTime = DateTimeOffset.FromUnixTimeSeconds(expSecond).UtcDateTime;
 	}
 	#endregion
+
 }
