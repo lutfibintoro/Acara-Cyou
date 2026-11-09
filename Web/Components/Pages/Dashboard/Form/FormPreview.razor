@@ -24,6 +24,14 @@ else
 	<MudPaper Height="100%" Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent pb-3 pt-8">
 		<MudContainer MaxWidth="MaxWidth.Large">
 			<MudPaper Height="100%" Width="100%" Elevation="10" Class="pa-6">
+				<MudText Typo="Typo.body1">@_eventDetail.Title</MudText>
+			</MudPaper>
+		</MudContainer>
+	</MudPaper>
+
+	<MudPaper Height="100%" Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent pb-3 pt-3">
+		<MudContainer MaxWidth="MaxWidth.Large">
+			<MudPaper Height="100%" Width="100%" Elevation="10" Class="pa-6">
 				<MudText Typo="Typo.body1">@((MarkupString)_eventDetail.Description)</MudText>
 			</MudPaper>
 		</MudContainer>
