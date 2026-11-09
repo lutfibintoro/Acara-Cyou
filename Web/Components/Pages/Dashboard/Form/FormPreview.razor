@@ -23,7 +23,7 @@ else
 {
 	<MudPaper Height="100%" Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent pb-3 pt-8">
 		<MudContainer MaxWidth="MaxWidth.Large">
-			<MudPaper Height="100%" Width="100%" Outlined="false" Elevation="0" Class="shades transparent">
+			<MudPaper Height="100%" Width="100%" Elevation="10" Class="pa-6">
 				<MudText Typo="Typo.body1">@((MarkupString)_eventDetail.Description)</MudText>
 			</MudPaper>
 		</MudContainer>
@@ -31,7 +31,7 @@ else
 
 	<MudPaper Height="100%" Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent pb-3 pt-3">
 		<MudContainer MaxWidth="MaxWidth.Large">
-			<MudPaper Width="100%" Outlined="true" Square="false" Elevation="0" Class="pa-6">
+			<MudPaper Width="100%" Elevation="10" Class="pa-6">
 				<MudStack Row="false" AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="5">
 					<MudPaper Width="100%" Outlined="false" Square="false" Elevation="0">
 						<MudText Typo="Typo.body1">setelah melakukan pembayaran, tiket akan terkirim ke email <strong><b>@_userEmail</b></strong> cek kotak masuk (Inbox) atau folder Spam/Junk jika Anda tidak menemukannya.</MudText>
@@ -102,10 +102,12 @@ else
 
 	<MudPaper Height="100%" Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent pb-20 pt-3">
 		<MudContainer MaxWidth="MaxWidth.Large">
-			<FormazeComponent T="FormTemplateModel"
-							  Key="@EventId"
-							  Model="@MyModel"
-							  EditMode="false" />
+			<MudPaper Width="100%" Height="100%" Elevation="10" Class="pa-6">
+				<FormazeComponent T="FormTemplateModel"
+								  Key="@EventId"
+								  Model="@MyModel"
+								  EditMode="false" />
+			</MudPaper>
 		</MudContainer>
 	</MudPaper>
 }
@@ -169,7 +171,7 @@ else
 		MethodSelectValue = newValue;
 
 		PaymentMethod paymentMethod = InfoPayment.PaymentMethods.Where(tc => tc.PaymentMethodId == Guid.Parse(newValue)).First();
-		
+
 		decimal ticketPrice = TicketSelect.PriceOne;
 		decimal flatFee = paymentMethod.FlatFee + paymentMethod.ApplicationFlatFee;
 		decimal percentageFee = paymentMethod.PercentageFee;
