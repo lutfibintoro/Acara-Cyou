@@ -6,6 +6,7 @@
         public PaymentMethodType Type { get; set; }
         public string Code { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
+        public int MaxExpiredInMinute { get; set; }
         public decimal FlatFee { get; set; }
         public decimal PercentageFee { get; set; }
         public PaymentMethodAdminFeeBearer AdminFeeBearer { get; set; }

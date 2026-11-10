@@ -1470,6 +1470,10 @@ namespace WebServer.Infrastructures.Data.Migrations
                         .HasColumnType("decimal(65,30)")
                         .HasColumnName("flat_fee");
 
+                    b.Property<int>("MaxExpiredInMinute")
+                        .HasColumnType("int")
+                        .HasColumnName("max_expired_in_minute");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext")
@@ -1503,6 +1507,7 @@ namespace WebServer.Infrastructures.Data.Migrations
                             AdminFeeBearer = "Customer",
                             Code = "BC",
                             FlatFee = 5000m,
+                            MaxExpiredInMinute = 1440,
                             Name = "BCA Virtual Account",
                             PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
                             PercentageFee = 0m,
@@ -1514,6 +1519,7 @@ namespace WebServer.Infrastructures.Data.Migrations
                             AdminFeeBearer = "Customer",
                             Code = "M2",
                             FlatFee = 3000m,
+                            MaxExpiredInMinute = 1440,
                             Name = "Mandiri Virtual Account",
                             PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
                             PercentageFee = 0m,
@@ -1525,6 +1531,7 @@ namespace WebServer.Infrastructures.Data.Migrations
                             AdminFeeBearer = "Customer",
                             Code = "VA",
                             FlatFee = 3000m,
+                            MaxExpiredInMinute = 1440,
                             Name = "Maybank Virtual Account",
                             PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
                             PercentageFee = 0m,
@@ -1536,6 +1543,7 @@ namespace WebServer.Infrastructures.Data.Migrations
                             AdminFeeBearer = "Customer",
                             Code = "I1",
                             FlatFee = 3000m,
+                            MaxExpiredInMinute = 1440,
                             Name = "BNI Virtual Account",
                             PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
                             PercentageFee = 0m,
@@ -1547,6 +1555,7 @@ namespace WebServer.Infrastructures.Data.Migrations
                             AdminFeeBearer = "Customer",
                             Code = "B1",
                             FlatFee = 3000m,
+                            MaxExpiredInMinute = 1440,
                             Name = "CIMB Niaga Virtual Account",
                             PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
                             PercentageFee = 0m,
@@ -1558,6 +1567,7 @@ namespace WebServer.Infrastructures.Data.Migrations
                             AdminFeeBearer = "Customer",
                             Code = "BT",
                             FlatFee = 0m,
+                            MaxExpiredInMinute = 1440,
                             Name = "Permata Bank Virtual Account",
                             PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
                             PercentageFee = 0m,
@@ -1569,6 +1579,7 @@ namespace WebServer.Infrastructures.Data.Migrations
                             AdminFeeBearer = "Customer",
                             Code = "A1",
                             FlatFee = 0m,
+                            MaxExpiredInMinute = 1440,
                             Name = "ATM Bersama",
                             PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
                             PercentageFee = 0m,
@@ -1580,6 +1591,7 @@ namespace WebServer.Infrastructures.Data.Migrations
                             AdminFeeBearer = "Customer",
                             Code = "AG",
                             FlatFee = 3000m,
+                            MaxExpiredInMinute = 1440,
                             Name = "Bank Artha Graha",
                             PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
                             PercentageFee = 0m,
@@ -1591,6 +1603,7 @@ namespace WebServer.Infrastructures.Data.Migrations
                             AdminFeeBearer = "Customer",
                             Code = "NC",
                             FlatFee = 3000m,
+                            MaxExpiredInMinute = 1440,
                             Name = "Bank Neo Commerce / BNC",
                             PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
                             PercentageFee = 0m,
@@ -1602,6 +1615,7 @@ namespace WebServer.Infrastructures.Data.Migrations
                             AdminFeeBearer = "Customer",
                             Code = "BR",
                             FlatFee = 3000m,
+                            MaxExpiredInMinute = 1440,
                             Name = "BRIVA",
                             PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
                             PercentageFee = 0m,
@@ -1613,6 +1627,7 @@ namespace WebServer.Infrastructures.Data.Migrations
                             AdminFeeBearer = "Customer",
                             Code = "S1",
                             FlatFee = 3000m,
+                            MaxExpiredInMinute = 1440,
                             Name = "Bank Sahabat Sampoerna",
                             PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
                             PercentageFee = 0m,
@@ -1624,6 +1639,7 @@ namespace WebServer.Infrastructures.Data.Migrations
                             AdminFeeBearer = "Customer",
                             Code = "BV",
                             FlatFee = 3000m,
+                            MaxExpiredInMinute = 1440,
                             Name = "BSI Virtual Account",
                             PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
                             PercentageFee = 0m,
@@ -1635,6 +1651,7 @@ namespace WebServer.Infrastructures.Data.Migrations
                             AdminFeeBearer = "Merchant",
                             Code = "NQ",
                             FlatFee = 0m,
+                            MaxExpiredInMinute = 24,
                             Name = "Nobu",
                             PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
                             PercentageFee = 0m,
