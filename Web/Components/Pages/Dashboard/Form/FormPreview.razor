@@ -114,12 +114,32 @@ else
 				<FormazeComponent T="FormTemplateModel"
 								  Key="@EventId"
 								  Model="@MyModel"
-								  EditMode="false" />
+								  EditMode="false"
+								  OnValidSubmit="(EditContext ctx) => _succedSubmit = true" />
 			</MudPaper>
 		</MudContainer>
 	</MudPaper>
 }
 
+<MudDialog @bind-Visible="_succedSubmit" Options="new DialogOptions() { CloseButton = true }">
+	<DialogContent>
+		<MudPaper Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent py-3">
+			<MudContainer MaxWidth="MaxWidth.Medium">
+				<MudPaper Height="100%" Width="100%" Elevation="10" Class="pa-6">
+					<MudText Typo="Typo.body1">@((MarkupString)_eventDetail.AfterBuyDescription)</MudText>
+				</MudPaper>
+			</MudContainer>
+		</MudPaper>
+
+		<MudPaper Width="100%" Square="true" Outlined="false" Elevation="0" Class="shades transparent py-3">
+			<MudContainer MaxWidth="MaxWidth.Medium">
+				<MudPaper Height="100%" Width="100%" Elevation="10" Class="pa-6">
+					<MudText Typo="Typo.body1">tiket akan terkirim ke email <strong><b>@_userEmail</b></strong> cek kotak masuk (Inbox) atau folder Spam/Junk jika Anda tidak menemukannya.</MudText>
+				</MudPaper>
+			</MudContainer>
+		</MudPaper>
+	</DialogContent>
+</MudDialog>
 
 <MudOverlay Visible="_loading" Style="height: 100dvh" DarkBackground="true" Absolute="true" ZIndex="5000">
 	<MudProgressCircular Color="Color.Primary" Indeterminate="true" />
@@ -167,6 +187,10 @@ else
 			}
 		}
 	}
+
+	#region succed dialog
+	private bool _succedSubmit = false;
+	#endregion
 
 	#region payment method select
 	public bool MethodIsSelected = false;
@@ -219,6 +243,10 @@ else
 	{
 		TicketIsSelected = true;
 		TicketSelectValue = newValue;
+		TypeIsSelected = false;
+		TypeSelectValue = string.Empty;
+		MethodIsSelected = false;
+		MethodSelectValue = string.Empty;
 
 		TicketSelect = _ticketCategory.Where(tc => tc.TicketId == Guid.Parse(newValue)).First();
 		if (((int)TicketSelect.PriceOne) == 0)
