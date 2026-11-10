@@ -126,15 +126,19 @@
 				<MudCardContent>
 					<MudText Typo="Typo.h6">Tanggal Buka</MudText>
 					<MudText Typo="Typo.body2">atur tanggal tiket mulai dibuka (tidak boleh lebih besar dari tanggal tutup)</MudText>
-					<MudDatePicker @bind-Date="_dateOpenTicketAdd" />
+					<MudDatePicker @bind-Date="_dateOpenTicketAdd"
+								   IsDateDisabledFunc="(DateTime datetime) => (datetime < _eventDetail.OpenRegistrationDate || datetime > _eventDetail.CloseRegistrationDate)"
+								   AdditionalDateClassesFunc="@((DateTime dt) => ((int)dt.DayOfWeek == 0 ? "red-text text-accent-3" : ""))" />
 					<MudTimePicker @bind-Time="_timeOpenTicketAdd" />
 				</MudCardContent>
 			</MudCard>
 			<MudCard Style="width: 100%">
 				<MudCardContent>
 					<MudText Typo="Typo.h6">Tanggal Tutup</MudText>
-					<MudText Typo="Typo.body2">atur tanggal batas waktu tiket ditutup (tidak boleh lebih besar dari tanggal buka)</MudText>
-					<MudDatePicker @bind-Date="_dateCloseTicketAdd" />
+					<MudText Typo="Typo.body2">atur tanggal batas waktu tiket ditutup (tidak boleh lebih kecil dari tanggal buka)</MudText>
+					<MudDatePicker @bind-Date="_dateCloseTicketAdd"
+								   IsDateDisabledFunc="(DateTime datetime) => (datetime < _eventDetail.OpenRegistrationDate || datetime > _eventDetail.CloseRegistrationDate)"
+								   AdditionalDateClassesFunc="@((DateTime dt)=>((int)dt.DayOfWeek == 0 ? "red-text text-accent-3" : ""))" />
 					<MudTimePicker @bind-Time="_timeCloseTicketAdd" />
 				</MudCardContent>
 			</MudCard>
@@ -193,15 +197,19 @@
 				<MudCardContent>
 					<MudText Typo="Typo.h6">Tanggal Buka</MudText>
 					<MudText Typo="Typo.body2">atur tanggal tiket mulai dibuka (tidak boleh lebih besar dari tanggal tutup)</MudText>
-					<MudDatePicker @bind-Date="_dateOpenTicket" />
+					<MudDatePicker @bind-Date="_dateOpenTicket"
+								   IsDateDisabledFunc="(DateTime datetime) => (datetime < _eventDetail.OpenRegistrationDate || datetime > _eventDetail.CloseRegistrationDate)"
+								   AdditionalDateClassesFunc="@((DateTime dt)=>((int)dt.DayOfWeek == 0 ? "red-text text-accent-3" : ""))" />
 					<MudTimePicker @bind-Time="_timeOpenTicket" />
 				</MudCardContent>
 			</MudCard>
 			<MudCard Style="width: 100%">
 				<MudCardContent>
 					<MudText Typo="Typo.h6">Tanggal Tutup</MudText>
-					<MudText Typo="Typo.body2">atur tanggal batas waktu tiket ditutup (tidak boleh lebih besar dari tanggal buka)</MudText>
-					<MudDatePicker @bind-Date="_dateCloseTicket" />
+					<MudText Typo="Typo.body2">atur tanggal batas waktu tiket ditutup (tidak boleh lebih kecil dari tanggal buka)</MudText>
+					<MudDatePicker @bind-Date="_dateCloseTicket"
+								   IsDateDisabledFunc="(DateTime datetime) => (datetime < _eventDetail.OpenRegistrationDate || datetime > _eventDetail.CloseRegistrationDate)"
+								   AdditionalDateClassesFunc="@((DateTime dt)=>((int)dt.DayOfWeek == 0 ? "red-text text-accent-3" : ""))" />
 					<MudTimePicker @bind-Time="_timeCloseTicket" />
 				</MudCardContent>
 			</MudCard>
@@ -233,6 +241,7 @@
 			AppNav.NavigateToPage();
 
 		await LoadTicketsAsync();
+		await LoadEvent();
 	}
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -414,6 +423,34 @@
 	}
 	#endregion
 
+	#region event load
+	public EventDetail _eventDetail = new();
+
+	public async Task LoadEvent()
+	{
+		_loading = true;
+
+		string? jwt = await LocalStorageService.GetItemAsync<string>("jwt");
+		var client = HttpClientFactory.CreateClient("backend");
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+		using (HttpResponseMessage response = await client.GetAsync($"/api/event/{EventId}"))
+		{
+			if (response.StatusCode == System.Net.HttpStatusCode.OK)
+			{
+				_eventDetail = (await response.Content.ReadFromJsonAsync<EventDetail>())!;
+			}
+			else
+			{
+				ProblemDetails errorValue = await response.Content.ReadFromJsonAsync<ProblemDetails>() ?? new ProblemDetails();
+				Snackbar.Add("failed load event" + errorValue.Errors[0].Reason, Severity.Error);
+			}
+		}
+
+		_loading = false;
+	}
+	#endregion
+
 	#region Load Ticket
 	public List<TicketCategory> _tickets = [];
 
@@ -502,6 +539,35 @@
 		public virtual string Reason { get; set; } = string.Empty;
 		public virtual string Code { get; set; } = string.Empty;
 		public virtual string Severity { get; set; } = string.Empty;
+	}
+
+	public class EventDetail
+	{
+		public Guid EventId { get; set; }
+		public Guid AcyouUserId { get; set; }
+		public string Title { get; set; } = string.Empty;
+		public string Description { get; set; } = string.Empty;
+		public string AfterBuyDescription { get; set; } = string.Empty;
+		public string FormTemplate { get; set; } = string.Empty;
+		public bool IsRegistrationOpen { get; set; }
+		public DateTime OpenRegistrationDate { get; set; }
+		public DateTime CloseRegistrationDate { get; set; }
+		public string BankAccountNumber { get; set; } = string.Empty;
+		public string BankAccountName { get; set; } = string.Empty;
+		public bool IsDeleted { get; set; }
+		public DateTime CreatedAt { get; set; }
+		public int RowVersion { get; set; }
+		public List<PosterDetail> Posters { get; set; } = [];
+	}
+
+	public class PosterDetail
+	{
+		public Guid PosterId { get; set; }
+		public string FullPathUrl { get; set; } = string.Empty;
+		public string MimeType { get; set; } = string.Empty;
+		public long ByteLength { get; set; }
+		public DateTime CreatedAt { get; set; }
+		public int RowVersion { get; set; }
 	}
 	#endregion
 
