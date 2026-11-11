@@ -38,7 +38,8 @@ namespace WebServer.Features.File.GetFile
                 return;
             }
 
-            PhysicalFileHttpResult result = TypedResults.PhysicalFile(fileName, contentType);
+            FileStream stream = System.IO.File.OpenRead(fileName);
+            FileStreamHttpResult result = TypedResults.File(stream, contentType);
             await Send.ResultAsync(result);
         }
 
