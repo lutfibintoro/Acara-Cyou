@@ -38,11 +38,8 @@ namespace WebServer.Features.File.GetFile
                 return;
             }
 
-            using (FileStream stream = System.IO.File.OpenRead(fileName))
-            {
-                FileStreamHttpResult result = TypedResults.File(stream, contentType);
-                await Send.ResultAsync(result);
-            }
+            PhysicalFileHttpResult result = TypedResults.PhysicalFile(fileName, contentType);
+            await Send.ResultAsync(result);
         }
 
         #region failed mapping
