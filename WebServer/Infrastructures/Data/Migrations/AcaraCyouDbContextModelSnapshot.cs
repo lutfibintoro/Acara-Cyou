@@ -1345,6 +1345,10 @@ namespace WebServer.Infrastructures.Data.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("id");
 
+                    b.Property<int>("AdminFeeBearer")
+                        .HasColumnType("int")
+                        .HasColumnName("admin_fee_bearer");
+
                     b.Property<DateTime?>("CallbackAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("callback_at");

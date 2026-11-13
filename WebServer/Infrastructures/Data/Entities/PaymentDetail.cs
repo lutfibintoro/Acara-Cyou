@@ -14,6 +14,7 @@ namespace WebServer.Infrastructures.Data.Entities
         public string Va { get; set; } = string.Empty;
         public string QrString { get; set; } = string.Empty;
         public PaymentDetailStatus Status { get; set; } = PaymentDetailStatus.Pending;
+        public PaymentDetailAdminFeeBearer AdminFeeBearer { get; set; }
         public string RawResponse { get; set; } = string.Empty;
         public DateTime? CallbackAt { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -32,5 +33,11 @@ namespace WebServer.Infrastructures.Data.Entities
         Pending,
         Deny,
         Expired
+    }
+
+    public enum PaymentDetailAdminFeeBearer
+    {
+        Merchant,
+        Customer
     }
 }
