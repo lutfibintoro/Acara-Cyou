@@ -208,8 +208,8 @@ else
 		decimal flatFee = paymentMethod.FlatFee + paymentMethod.ApplicationFlatFee;
 		decimal percentageFee = paymentMethod.PercentageFee;
 
-		decimal plusPercentage = ticketPrice * (percentageFee / 100m);
-		decimal total = ticketPrice + plusPercentage + flatFee;
+		decimal plusPercentage = 1m - (percentageFee / 100m);
+		decimal total = Math.Ceiling((ticketPrice + flatFee) / plusPercentage);
 
 		PriceDetail = [
 			(TicketPrice: (int)ticketPrice, FlatFee: (int)flatFee, PercentageFee: percentageFee, Total: total)
