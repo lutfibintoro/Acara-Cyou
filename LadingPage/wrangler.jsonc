@@ -1,0 +1,8 @@
+{
+  "name": "acara-cyou-lading-page",
+  "compatibility_date": "2026-10-23",
+  "assets": {
+    "directory": "dist"
+  },
+  "preview_urls": false
+}
