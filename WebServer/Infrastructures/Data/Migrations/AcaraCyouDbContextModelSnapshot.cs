@@ -1656,9 +1656,21 @@ namespace WebServer.Infrastructures.Data.Migrations
                             Code = "NQ",
                             FlatFee = 0m,
                             MaxExpiredInMinute = 24,
-                            Name = "Nobu",
+                            Name = "Nobu Qris",
                             PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
                             PercentageFee = 0m,
+                            Type = "Qris"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-00000000000e"),
+                            AdminFeeBearer = "Merchant",
+                            Code = "SP",
+                            FlatFee = 0m,
+                            MaxExpiredInMinute = 24,
+                            Name = "Shopeepay Qris",
+                            PaymentGatewayId = new Guid("10000000-0000-0000-0000-000000000000"),
+                            PercentageFee = 0.7m,
                             Type = "Qris"
                         });
                 });
