@@ -5,6 +5,8 @@ using FluentValidation;
 using Microsoft.AspNetCore.WebUtilities;
 using Scalar.AspNetCore;
 using WebServer.Extensions;
+using WebServer.Infrastructures.Payments.CreatePayment;
+using WebServer.Shared.Payments.CreatePayment;
 
 namespace WebServer
 {
@@ -21,14 +23,19 @@ namespace WebServer
             builder.Services.AddMemoryCache();
             builder.Services.OpenApiDocument(o => o.AutoTagPathSegmentIndex = 2);
 
-            // application extension
+            // application extension.
             builder.Services.AddApplicationDbSetup(builder.Configuration);
             builder.Services.AddApplicationCors(builder.Configuration);
             builder.Services.AddApplicationAuth(builder.Configuration);
+            builder.Services.AddApplicationHttpClient(builder.Configuration);
             builder.Services.AddApplicationException();
+            builder.Services.AddApplicationHangfireSetup();
             builder.Services.AddApplicationStatusCodePage();
 
-            
+            // sementara.
+            builder.Services.AddSingleton<IPaymentGatewayCreate, DuitkuPaymentGatewayCreate>();
+
+
 
             WebApplication app = builder.Build();
 
