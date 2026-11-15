@@ -1267,6 +1267,10 @@ namespace WebServer.Infrastructures.Data.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("is_checked_in");
 
+                    b.Property<bool>("IsEmailSend")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_email_send");
+
                     b.Property<int>("RowVersion")
                         .IsConcurrencyToken()
                         .HasColumnType("int")

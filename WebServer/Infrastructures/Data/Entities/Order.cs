@@ -12,6 +12,7 @@ namespace WebServer.Infrastructures.Data.Entities
         public OrderStatus Status { get; set; } = OrderStatus.Pending;
         public string FormTemplateValue { get; set; } = string.Empty;
         public bool IsCheckedIn { get; set; } = false;
+        public bool IsEmailSend { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         [ConcurrencyCheck]
