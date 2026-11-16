@@ -8,7 +8,6 @@ RUN dotnet restore
 
 # compile app
 COPY . .
-RUN dotnet ef database update
 RUN dotnet publish -c Release -o /app --no-restore /p:UseAppHost=false
 
 # ---------------- runtime stage -------------------

@@ -38,6 +38,7 @@ namespace WebServer
 
 
             WebApplication app = builder.Build();
+            ApplicationDbSetup.MigrateDbSetup(app);
 
             // Configure the HTTP request pipeline.
             app.UseExceptionHandler();

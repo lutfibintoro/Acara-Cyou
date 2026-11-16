@@ -31,5 +31,15 @@ namespace WebServer.Extensions
 
             return services;
         }
+
+        public static void MigrateDbSetup(WebApplication app)
+        {
+            using (IServiceScope scope = app.Services.CreateScope())
+            {
+                IServiceProvider services = scope.ServiceProvider;
+                AcaraCyouDbContext context = services.GetRequiredService<AcaraCyouDbContext>();
+                context.Database.Migrate();
+            }
+        }
     }
 }
