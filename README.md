@@ -89,7 +89,9 @@ Pastikan Anda melihat file bernama `docker-compose.yml`.
 7. Buka aplikasi melalui browser:
 
 ```text
-   http://localhost:7116
+   http://localhost:7116 lading page
+   http://localhost:7115 dashboard
+   http://localhost:8081/scalar dokumentasi api backend
    ```
 
 ## Catatan
