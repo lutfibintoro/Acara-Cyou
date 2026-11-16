@@ -127,7 +127,7 @@
 					<MudText Typo="Typo.h6">Tanggal Buka</MudText>
 					<MudText Typo="Typo.body2">atur tanggal tiket mulai dibuka (tidak boleh lebih besar dari tanggal tutup)</MudText>
 					<MudDatePicker @bind-Date="_dateOpenTicketAdd"
-								   IsDateDisabledFunc="(DateTime datetime) => (datetime < _eventDetail.OpenRegistrationDate || datetime > _eventDetail.CloseRegistrationDate)"
+								   IsDateDisabledFunc="(DateTime datetime) => (datetime.Date < _eventDetail.OpenRegistrationDate.Date || datetime.Date > _eventDetail.CloseRegistrationDate.Date)"
 								   AdditionalDateClassesFunc="@((DateTime dt) => ((int)dt.DayOfWeek == 0 ? "red-text text-accent-3" : ""))" />
 					<MudTimePicker @bind-Time="_timeOpenTicketAdd" />
 				</MudCardContent>
@@ -137,7 +137,7 @@
 					<MudText Typo="Typo.h6">Tanggal Tutup</MudText>
 					<MudText Typo="Typo.body2">atur tanggal batas waktu tiket ditutup (tidak boleh lebih kecil dari tanggal buka)</MudText>
 					<MudDatePicker @bind-Date="_dateCloseTicketAdd"
-								   IsDateDisabledFunc="(DateTime datetime) => (datetime < _eventDetail.OpenRegistrationDate || datetime > _eventDetail.CloseRegistrationDate)"
+								   IsDateDisabledFunc="(DateTime datetime) => (datetime.Date < _eventDetail.OpenRegistrationDate.Date || datetime.Date > _eventDetail.CloseRegistrationDate.Date)"
 								   AdditionalDateClassesFunc="@((DateTime dt)=>((int)dt.DayOfWeek == 0 ? "red-text text-accent-3" : ""))" />
 					<MudTimePicker @bind-Time="_timeCloseTicketAdd" />
 				</MudCardContent>
