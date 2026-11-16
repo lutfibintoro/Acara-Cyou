@@ -35,7 +35,7 @@ services:
       ConnectionStrings__MariadbConnection: Server=mariadb;Port=3306;Database=AcaraCyouDb;Uid=root;Pwd=admin;AllowUserVariables=True;
     depends_on:
       mariadb:
-        condition: service_started
+        condition: service_healthy
     volumes:
       - acaracyou_backend_volume:/app/UserUploads
     ports:
@@ -51,6 +51,11 @@ services:
       - acaracyou_mariadb_volume:/var/lib/mysql
     ports:
       - "3306:3306"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   acaracyou_mariadb_volume:
