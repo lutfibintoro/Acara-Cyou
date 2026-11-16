@@ -35,6 +35,7 @@ Acara.Cyou menyediakan sistem pendaftaran acara dengan pembayaran QRIS otomatis,
 * Cocok digunakan oleh komunitas, himpunan, organisasi, dan penyelenggara acara kampus
 
 
+
 ## Cara Menjalankan
 
 ### Persyaratan aplikasi
@@ -71,7 +72,7 @@ Pastikan aplikasi berikut sudah terinstal di WSL (Ubuntu):
    ls
    ```
 
-   Pastikan Anda melihat file bernama `docker-compose.yml`.
+Pastikan Anda melihat file bernama `docker-compose.yml`.
 
 5. Buat container Docker:
 
