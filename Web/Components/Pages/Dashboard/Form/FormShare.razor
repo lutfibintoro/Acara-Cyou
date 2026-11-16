@@ -21,7 +21,7 @@
 								Form Pendaftaran
 							</MudText>
 
-							<MudChip Color="@(_isLink1Saved ? Color.Success : Color.Error)" T="string" Tint="Color.Primary" Size="Size.Small">
+							<MudChip Color="@(_isLink1Saved ? Color.Success : Color.Error)" T="string" Size="Size.Small">
 								@(_isLink1Saved ? "Tersimpan" : "Tidak Tersimpan")
 							</MudChip>
 						</MudStack>
@@ -119,7 +119,7 @@
 								Halaman Event
 							</MudText>
 
-							<MudChip Color="@(_isLink2Saved ? Color.Success : Color.Error)" T="string" Tint="Color.Primary" Size="Size.Small">
+							<MudChip Color="@(_isLink2Saved ? Color.Success : Color.Error)" T="string" Size="Size.Small">
 								@(_isLink2Saved ? "Tersimpan" : "Tidak Tersimpan")
 							</MudChip>
 						</MudStack>
@@ -441,7 +441,11 @@
 			return;
 		}
 
-		AppNav.NavigateToUrl("https://" + url);
+		string currentUri = Navigation.Uri;
+		var uri = new Uri(currentUri);
+		string protocolType = uri.Scheme;
+
+		AppNav.NavigateToUrl($"{protocolType}://" + url);
 	}
 
 	private async Task CopyLink(LinkModel link)

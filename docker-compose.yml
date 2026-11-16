@@ -1,4 +1,28 @@
 services:
+  ladingpage:
+    build:
+      context: ./LadingPage
+      dockerfile: Dockerfile
+    networks:
+      - acaracyou_net
+    depends_on:
+      frontend:
+        condition: service_started
+    ports:
+      - "7116:7116"
+
+  frontend:
+    build:
+      context: ./Web
+      dockerfile: Dockerfile
+    networks:
+      - acaracyou_net
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "7115:7115"
+
   backend:
     build:
       context: ./WebServer
@@ -9,6 +33,10 @@ services:
       ASPNETCORE_HTTP_PORTS: 8081
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__MariadbConnection: Server=mariadb;Port=3306;Database=AcaraCyouDb;Uid=root;Pwd=admin;AllowUserVariables=True;
+      FrontendBaseAddress: http://localhost:7115
+      AllowedCors__0: http://localhost:7115
+      AllowedCors__1: http://localhost:7116
+      Authentication__Google__CallbackPage: http://localhost:7115/google-login/callback
     depends_on:
       mariadb:
         condition: service_started
