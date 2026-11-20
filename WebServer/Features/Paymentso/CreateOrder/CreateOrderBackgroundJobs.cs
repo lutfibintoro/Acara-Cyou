@@ -54,7 +54,9 @@ namespace WebServer.Features.Paymentso.CreateOrder
                     return;
                 }
 
-                _backgroundJobClient.Schedule<CreateOrderBackgroundJobs>(x => x.DelayedCheck(orderId, ticketId), TimeSpan.FromMinutes(paymentMethod.MaxExpiredInMinute + 1));
+                _backgroundJobClient.Schedule<CreateOrderBackgroundJobs>(
+                    x => x.DelayedCheck(orderId, ticketId),
+                    TimeSpan.FromMinutes(paymentMethod.MaxExpiredInMinute + 1));
             }
         }
 
@@ -179,7 +181,7 @@ namespace WebServer.Features.Paymentso.CreateOrder
                 }
             });
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; true; i++)
             {
                 bool ticketIsFull = myTicket.BookedQuota >= myTicket.Quota;
                 if (ticketIsFull)
@@ -202,8 +204,8 @@ namespace WebServer.Features.Paymentso.CreateOrder
                 }
             }
 
-            ConcurrencyError<string> concurrenResultError = new("ticketId", $"{ticketId}", $"ticket [{ticketId}] was concurrently modified by another request", Severity.Error);
-            return Result.Fail(concurrenResultError);
+            //ConcurrencyError<string> concurrenResultError = new("ticketId", $"{ticketId}", $"ticket [{ticketId}] was concurrently modified by another request", Severity.Error);
+            //return Result.Fail(concurrenResultError);
         }
 
         private static async Task<Result> CancelOrderAsync(AcaraCyouDbContext dbContext, Guid orderId)
