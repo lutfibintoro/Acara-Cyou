@@ -20,7 +20,7 @@ namespace WebServer.Infrastructures.Payments.CreatePayment
             _configuration = configuration;
         }
 
-        public string PaymentGatewayName => Data.Entities.PaymentGatewayName.Duitku.ToString();
+        public PaymentGatewayCreateName PaymentGatewayName => PaymentGatewayCreateName.Duitku;
 
         public async Task<Result<PaymentGatewayCreateResponse>> CreatePaymentAsync(PaymentGatewayCreateRequest request, CancellationToken ct)
         {

@@ -122,8 +122,14 @@ namespace WebServer.Features.Paymentso.CreateOrder
         #region payment
         private async Task<Result<PaymentGatewayCreateResponse>> CreatePaymentAsync(PaymentGateway paymentGateway, PaymentMethod paymentMethod, string baseAddress, decimal amountDue, Guid orderId, string category, string customerEmail)
         {
+            PaymentGatewayCreateName paymentGatewayName = paymentGateway.Name switch
+            {
+                PaymentGatewayName.Duitku => PaymentGatewayCreateName.Duitku,
+                _ => PaymentGatewayCreateName.Duitku
+            };
+
             IPaymentGatewayCreate paymentGatewayCreate = _paymentGatewayCreates
-                .Where(payment => payment.PaymentGatewayName == paymentGateway.Name.ToString())
+                .Where(payment => payment.PaymentGatewayName == paymentGatewayName)
                 .First();
 
             var paymentGatewayCreateRequest = new PaymentGatewayCreateRequest()
